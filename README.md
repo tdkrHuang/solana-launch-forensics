@@ -30,7 +30,7 @@ created (UTC)        batch  mint                                            tx
 ## Install
 
 ```bash
-git clone https://github.com/<you>/solana-launch-forensics
+git clone https://github.com/tdkrHuang/solana-launch-forensics
 cd solana-launch-forensics
 python3 -m launchforensics --help
 ```
