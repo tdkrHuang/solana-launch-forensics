@@ -259,10 +259,27 @@ would be wrong, and a reviewer will check.
   found when the RPC returns parsed `initializeMint` instructions.
 - **No price or PnL data.** Deliberately. Prices come from third-party APIs with
   their own reliability; this tool only reports what the chain itself records.
+- **Endpoints disagree.** Some public RPCs return an empty signature list for
+  addresses they do not index — including wallets that are active. `scan` will
+  report `no signatures returned`. Confirm on a second endpoint before treating
+  a wallet as inactive, and say which endpoint you used.
 - **Not a verdict.** Repeated equal-size payouts and batched creations are patterns,
   not proof of wrongdoing.
 
 ---
+
+## Paid reports
+
+Reading the code is free. If you need this applied to a specific wallet — with
+the funding chain, payout reconstruction and a PDF you can hand to a community,
+a lawyer or an exchange — I write those reports with this tool:
+
+- **Lite $99** — one wallet, 48h
+- **Standard $299** — up to 5 wallets, 72h
+- **Deep $699** — up to 15 wallets, legal appendix, 5 business days
+
+Every claim carries a signature. Sample report (real case, 96 launches):
+[docs/sample-report.md](docs/sample-report.md)
 
 ## Tests
 
