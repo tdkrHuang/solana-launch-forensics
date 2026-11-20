@@ -9,6 +9,7 @@ import time
 
 from . import analytics as A
 from .cluster import build_clusters, dedupe_edges
+from .pipeline import collect_edges
 from .rpc import DEFAULT_RPC, Rpc
 
 
@@ -288,55 +289,22 @@ def cmd_cluster(args: argparse.Namespace) -> int:
     rpc = Rpc(args.rpc, pause=args.pause, retries=args.retries)
     progress(f"fetching up to {args.limit} signatures for {args.wallet}")
 
-    sigs = rpc.signatures(args.wallet, limit=args.limit)
-    if not sigs:
+    scan = collect_edges(
+        rpc,
+        args.wallet,
+        limit=args.limit,
+        on_progress=progress,
+        on_error=lambda sig, exc: progress(f"  ! {short(sig, 12)}: {exc}"),
+    )
+    if scan["requested"] == 0:
         progress("no signatures returned")
         return 1
+    if scan["stopped_early"]:
+        progress("too many failures; the RPC is rate limiting. Retry with --rpc <endpoint>")
 
-    edges: list[dict] = []
-    scanned = 0
-    failed = 0
-
-    for i, sig in enumerate(sigs, 1):
-        try:
-            tx = rpc.transaction(sig["signature"])
-        except Exception as exc:  # noqa: BLE001 - one bad tx must not end the scan
-            failed += 1
-            progress(f"  ! {short(sig['signature'], 12)}: {exc}")
-            if failed > 20 and failed * 4 > scanned:
-                progress("too many failures; the RPC is rate limiting. Retry with --rpc <endpoint>")
-                break
-            continue
-        if not tx:
-            continue
-        scanned += 1
-
-        info = A.summarize(tx)
-        payer = info["fee_payer"]
-        where = {
-            "signature": sig["signature"],
-            "slot": sig["slot"],
-            "block_time": sig.get("blockTime"),
-        }
-        if payer and info["creates"] > 0:
-            for mint in info["mints"]:
-                edges.append({"type": "created", "wallet": payer, "mint": mint, **where})
-        if payer:
-            for mint in A.swept_mints(tx):
-                edges.append({"type": "swept", "wallet": payer, "mint": mint, **where})
-        for flow in A.funding_inflows(tx):
-            edges.append(
-                {
-                    "type": "funded",
-                    "from": flow["from"],
-                    "to": flow["to"],
-                    "lamports": flow["lamports"],
-                    **where,
-                }
-            )
-
-        if i % 20 == 0:
-            progress(f"  {i}/{len(sigs)} transactions")
+    edges = scan["edges"]
+    scanned = scan["scanned"]
+    failed = scan["failed"]
 
     clusters = build_clusters(edges, min_mints=args.min_mints)
     counts: dict[str, int] = {}

@@ -164,6 +164,30 @@ unrelated wallets, so read the `funded` edges with that in mind; `created` and
 
 ---
 
+## Dataset
+
+`datasets/clusters.jsonl` collects reproducible cluster records: the seed wallet,
+the exact command, the scan bound, the evidence counts and a confidence grade.
+The schema is documented in [`datasets/SCHEMA.md`](datasets/SCHEMA.md).
+
+```bash
+python3 tools/build_dataset.py --seeds datasets/seeds.json --limit 200
+python3 tools/build_dataset.py --seeds datasets/seeds.json --dry-run
+```
+
+Grading is by the weakest link used to join the mints:
+
+| Grade | Condition |
+|---|---|
+| `high` | at least one `swept` edge — only a creator can collect the fee |
+| `medium` | two or more `created` edges from one wallet |
+| `low` | joined only by funding transfers (dropped by default) |
+
+Records are keyed by a hash of their mints, so re-running updates instead of
+duplicating, and a rate-limited run keeps what it already wrote.
+
+---
+
 ## What it correctly distinguishes
 
 Two traps that produce wrong conclusions:
