@@ -35,6 +35,7 @@ ASSOCIATED_TOKEN_PROGRAM = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
 LAMPORTS_PER_SOL = 1_000_000_000
 
 CREATE_INSTRUCTIONS = {"Create", "CreateV2"}
+SWEEP_INSTRUCTIONS = {"SweepCreatorFee", "CollectCreatorFeeV2"}
 
 
 # -- accounts -------------------------------------------------------------
@@ -159,6 +160,28 @@ def create_count(tx: dict) -> int:
     return sum(1 for name in pump_instruction_names(tx) if name in CREATE_INSTRUCTIONS)
 
 
+def sweep_count(tx: dict) -> int:
+    """Number of creator-fee collection calls.
+
+    ``SweepCreatorFee`` and ``CollectCreatorFeeV2`` can only be issued by a
+    mint's creator, so a sweep is ownership evidence, not a behavioural
+    guess. It is also easily confused with a creation when instructions are
+    counted without reading their names.
+    """
+    return sum(1 for name in pump_instruction_names(tx) if name in SWEEP_INSTRUCTIONS)
+
+
+def swept_mints(tx: dict) -> list[str]:
+    """Mints whose creator fee was collected in this transaction.
+
+    Returns an empty list for transactions that contain no sweep, so the
+    caller can use it as a predicate without a second pass over the logs.
+    """
+    if not sweep_count(tx):
+        return []
+    return token_mints_in_tx(tx)
+
+
 # -- tokens ---------------------------------------------------------------
 def token_mints_in_tx(tx: dict) -> list[str]:
     """Mints *referenced* by the transaction.
@@ -211,6 +234,32 @@ def system_transfers(tx: dict) -> list[dict]:
                 "source": info.get("source"),
                 "destination": info.get("destination"),
                 "lamports": lamports,
+            }
+        )
+    return out
+
+
+def funding_inflows(tx: dict) -> list[dict]:
+    """SOL transfers into the fee payer from another account.
+
+    A launch wallet is usually funded just before it creates, so the payer is
+    a useful link between otherwise unrelated creations. Transfers out of the
+    payer are excluded: they say nothing about who controls it.
+    """
+    payer = fee_payer(tx)
+    if not payer:
+        return []
+    out: list[dict] = []
+    for t in system_transfers(tx):
+        if t["destination"] != payer or t["source"] == payer:
+            continue
+        if t["lamports"] <= 0 or not t["source"]:
+            continue
+        out.append(
+            {
+                "from": t["source"],
+                "to": payer,
+                "lamports": t["lamports"],
             }
         )
     return out

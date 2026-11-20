@@ -8,6 +8,7 @@ import sys
 import time
 
 from . import analytics as A
+from .cluster import build_clusters, dedupe_edges
 from .rpc import DEFAULT_RPC, Rpc
 
 
@@ -283,6 +284,124 @@ def cmd_flows(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_cluster(args: argparse.Namespace) -> int:
+    rpc = Rpc(args.rpc, pause=args.pause, retries=args.retries)
+    progress(f"fetching up to {args.limit} signatures for {args.wallet}")
+
+    sigs = rpc.signatures(args.wallet, limit=args.limit)
+    if not sigs:
+        progress("no signatures returned")
+        return 1
+
+    edges: list[dict] = []
+    scanned = 0
+    failed = 0
+
+    for i, sig in enumerate(sigs, 1):
+        try:
+            tx = rpc.transaction(sig["signature"])
+        except Exception as exc:  # noqa: BLE001 - one bad tx must not end the scan
+            failed += 1
+            progress(f"  ! {short(sig['signature'], 12)}: {exc}")
+            if failed > 20 and failed * 4 > scanned:
+                progress("too many failures; the RPC is rate limiting. Retry with --rpc <endpoint>")
+                break
+            continue
+        if not tx:
+            continue
+        scanned += 1
+
+        info = A.summarize(tx)
+        payer = info["fee_payer"]
+        where = {
+            "signature": sig["signature"],
+            "slot": sig["slot"],
+            "block_time": sig.get("blockTime"),
+        }
+        if payer and info["creates"] > 0:
+            for mint in info["mints"]:
+                edges.append({"type": "created", "wallet": payer, "mint": mint, **where})
+        if payer:
+            for mint in A.swept_mints(tx):
+                edges.append({"type": "swept", "wallet": payer, "mint": mint, **where})
+        for flow in A.funding_inflows(tx):
+            edges.append(
+                {
+                    "type": "funded",
+                    "from": flow["from"],
+                    "to": flow["to"],
+                    "lamports": flow["lamports"],
+                    **where,
+                }
+            )
+
+        if i % 20 == 0:
+            progress(f"  {i}/{len(sigs)} transactions")
+
+    clusters = build_clusters(edges, min_mints=args.min_mints)
+    counts: dict[str, int] = {}
+    for e in dedupe_edges(edges):
+        counts[e["type"]] = counts.get(e["type"], 0) + 1
+
+    result = {
+        "wallet": args.wallet,
+        "scanned_transactions": scanned,
+        "failed_transactions": failed,
+        "edge_counts": counts,
+        "cluster_count": len(clusters),
+        "clusters": clusters,
+    }
+
+    if args.out:
+        with open(args.out, "w", encoding="utf-8") as fh:
+            json.dump(result, fh, indent=2)
+        progress(f"wrote {args.out}")
+
+    if args.json:
+        print(json.dumps(result, indent=2))
+        return 0
+
+    print(f"wallet      {args.wallet}")
+    print(f"scanned     {scanned} transactions")
+    if failed:
+        print(f"failed      {failed} (RPC errors, skipped)")
+    links = ", ".join(f"{k} {v}" for k, v in sorted(counts.items())) or "none"
+    print(f"evidence    {links}")
+    print(f"clusters    {len(clusters)}  (minimum {args.min_mints} mints)")
+
+    if not clusters:
+        print("\nNo cluster above the threshold.")
+        return 0
+
+    for n, c in enumerate(clusters, 1):
+        print()
+        print(f"cluster {n}: {len(c['mints'])} mints, {len(c['wallets'])} wallets")
+        c_links = ", ".join(f"{k} {v}" for k, v in sorted(c["links"].items()))
+        print(f"  links      {c_links}")
+        if c["first_block_time"] and c["last_block_time"]:
+            span = c["last_block_time"] - c["first_block_time"]
+            print(f"  window     {utc(c['first_block_time'])} -> {utc(c['last_block_time'])} ({span // 60}m {span % 60}s)")
+        print("  wallets")
+        for w in c["wallets"]:
+            print(f"    - {w}")
+        print("  mints")
+        for m in c["mints"][: args.max_mints]:
+            print(f"    - {m}")
+        if len(c["mints"]) > args.max_mints:
+            print(f"    ... {len(c['mints']) - args.max_mints} more")
+        print("  evidence")
+        for e in c["edges"][: args.max_edges]:
+            if e["type"] == "funded":
+                path = f"{short(e['from'], 10)} -> {short(e['to'], 10)}  {A.format_sol(e['lamports'])} SOL"
+            else:
+                path = f"{short(e['wallet'], 10)} -> {short(e['mint'], 10)}"
+            print(f"    {e['type']:8s} {path}  {short(e['signature'], 12)}")
+        if len(c["edges"]) > args.max_edges:
+            print(f"    ... {len(c['edges']) - args.max_edges} more")
+
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="launchforensics",
@@ -319,6 +438,19 @@ def build_parser() -> argparse.ArgumentParser:
     flows.add_argument("--out", help="write full JSON result here")
     flows.add_argument("--json", action="store_true")
     flows.set_defaults(func=cmd_flows)
+
+    cluster = sub.add_parser(
+        "cluster",
+        help="group mints by fee payer, funding wallet and fee-sweep evidence",
+    )
+    cluster.add_argument("wallet")
+    cluster.add_argument("--limit", type=int, default=200, help="transactions to inspect (max 1000)")
+    cluster.add_argument("--min-mints", type=int, default=2, help="ignore components below this mint count")
+    cluster.add_argument("--max-mints", type=int, default=25, help="mints printed per cluster")
+    cluster.add_argument("--max-edges", type=int, default=25, help="evidence lines printed per cluster")
+    cluster.add_argument("--out", help="write full JSON result here")
+    cluster.add_argument("--json", action="store_true")
+    cluster.set_defaults(func=cmd_cluster)
 
     return parser
 

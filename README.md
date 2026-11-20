@@ -3,11 +3,12 @@
 Read-only forensics for pump.fun style token launches. **Standard library only** — no
 API key, no `pip install` of crypto SDKs, no wallet connection.
 
-It answers three questions from public chain data alone:
+It answers four questions from public chain data alone:
 
 1. **Which mints did a wallet create?**
 2. **How fast, and did any share a transaction?**
 3. **How did the SOL leave, and did the payouts repeat one size?**
+4. **Which mints belong to the same operator, and what is the evidence?**
 
 Every output line is traceable to a signature you can paste into an explorer.
 The tool never guesses intent.
@@ -103,6 +104,64 @@ $ launchforensics flows GtTg74Zp… --limit 150 --min-sol 0.4 --across-tx
 `--across-tx` is the mode that matters for payout analysis: a splitter usually pays
 one destination per transaction, so a within-transaction view finds nothing.
 
+### `cluster <wallet>` — mints that share evidence
+
+```bash
+launchforensics cluster <WALLET> --limit 400
+```
+
+Builds a graph whose nodes are wallets and mints and whose edges are individual,
+signed facts:
+
+| Edge | Meaning |
+|---|---|
+| `created` | the wallet paid for the transaction that created the mint |
+| `swept` | the wallet collected that mint's creator fee — only the creator can |
+| `funded` | SOL moved from one wallet to another |
+
+Connected components containing at least two mints are printed together, with the
+signature of every link, so any single claim can be checked on an explorer.
+
+| Flag | Meaning |
+|---|---|
+| `--min-mints N` | ignore components below N mints (default 2) |
+| `--max-mints N` | mints printed per cluster (default 25) |
+| `--max-edges N` | evidence lines printed per cluster (default 25) |
+| `--out FILE` | write the full JSON result |
+| `--json` | print JSON to stdout |
+
+Example output (addresses shortened):
+
+```
+wallet      GtTg74ZpUb…4W14
+scanned     5 transactions
+evidence    created 3, funded 1, swept 3
+clusters    1  (minimum 2 mints)
+
+cluster 1: 3 mints, 2 wallets
+  links      created 3, funded 1, swept 3
+  window     2025-11-16 04:50:00 -> 2025-11-16 05:16:21 (26m 21s)
+  wallets
+    - GtTg74ZpUb…4W14
+    - 8fJ1XKz6Yb…QwZa
+  mints
+    - EGX8MJT8wd…pump
+    - 2ZZhunwtYT…pump
+    - 2GoDADTFmh…pump
+  evidence
+    created  GtTg74ZpUb…4W14 -> EGX8MJT8wd…pump  create1
+    funded   8fJ1XKz6Yb…QwZa -> GtTg74ZpUb…4W14  0.05 SOL  fund1
+    swept    GtTg74ZpUb…4W14 -> EGX8MJT8wd…pump  sweep1
+```
+
+A control wallet — one that created a single token and collected nothing — prints
+`No cluster above the threshold.` That silence is the point: the command reports
+links it can sign, not wallets it finds interesting.
+
+Shared funding is a link, not proof. Exchanges and faucets fund thousands of
+unrelated wallets, so read the `funded` edges with that in mind; `created` and
+`swept` are the stronger links because both require control of the wallet.
+
 ---
 
 ## What it correctly distinguishes
@@ -156,6 +215,29 @@ would be wrong, and a reviewer will check.
 }
 ```
 
+`cluster` writes:
+
+```json
+{
+  "wallet": "...",
+  "scanned_transactions": 400,
+  "edge_counts": {"created": 84, "funded": 12, "swept": 61},
+  "cluster_count": 2,
+  "clusters": [
+    {
+      "mints": ["...pump", "...pump"],
+      "wallets": ["..."],
+      "links": {"created": 84, "funded": 12, "swept": 61},
+      "first_block_time": 1763268569,
+      "last_block_time": 1763272285,
+      "edges": [
+        {"type": "created", "wallet": "...", "mint": "...pump", "signature": "..."}
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ## Limits, stated plainly
@@ -190,7 +272,9 @@ python3 -m pytest -q
 
 Fixtures in `tests/fixtures.py` mirror real responses, including a versioned
 transaction **without `message.header`** and a Token-2022 `InitializeMint2` nested
-inside a pump.fun call.
+inside a pump.fun call. `tests/test_cluster.py` covers the graph rules: a single
+mint is never a cluster, shared funding joins two wallets, a sweep joins mints to
+the sweeper, and duplicate links collapse without duplicating mints.
 
 ---
 
