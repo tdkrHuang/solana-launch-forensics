@@ -1,5 +1,9 @@
 # solana-launch-forensics
 
+[![PyPI](https://img.shields.io/pypi/v/solana-launch-forensics)](https://pypi.org/project/solana-launch-forensics/)
+[![CI](https://github.com/tdkrHuang/solana-launch-forensics/actions/workflows/ci.yml/badge.svg)](https://github.com/tdkrHuang/solana-launch-forensics/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Read-only forensics for pump.fun style token launches. **Standard library only** — no
 API key, no `pip install` of crypto SDKs, no wallet connection.
 
@@ -31,19 +35,21 @@ created (UTC)        batch  mint                                            tx
 ## Install
 
 ```bash
+pip install solana-launch-forensics
+launchforensics --help
+```
+
+Python 3.9+. No third-party dependencies — the package installs nothing but itself.
+
+Or run it straight from the repository without installing:
+
+```bash
 git clone https://github.com/tdkrHuang/solana-launch-forensics
 cd solana-launch-forensics
 python3 -m launchforensics --help
 ```
 
-Python 3.9+. Nothing to install.
-
-Optionally, as a command:
-
-```bash
-pip install -e .
-launchforensics --help
-```
+[PyPI](https://pypi.org/project/solana-launch-forensics/)
 
 ---
 
