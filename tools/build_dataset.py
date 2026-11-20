@@ -59,6 +59,24 @@ def load_existing(path: pathlib.Path) -> dict[str, dict]:
     return out
 
 
+def load_scanned(path: pathlib.Path) -> dict[str, int]:
+    """How deep each seed has already been scanned.
+
+    Without this, an unattended loop would re-scan every known seed on every
+    round and spend its whole budget on the first few wallets.
+    """
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def save_scanned(path: pathlib.Path, state: dict[str, int]) -> None:
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build a cluster dataset from seed wallets.")
     parser.add_argument("--seeds", default="datasets/seeds.json")
@@ -75,6 +93,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--pause", type=float, default=0.35)
     parser.add_argument("--retries", type=int, default=6)
     parser.add_argument("--timeout", type=float, default=45.0)
+    parser.add_argument("--state", help="scan-depth bookkeeping (default: <out>.scanned.json)")
+    parser.add_argument("--force", action="store_true", help="re-scan seeds already covered")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
@@ -94,12 +114,18 @@ def main(argv: list[str] | None = None) -> int:
     rpc_kwargs = {"pause": args.pause, "retries": args.retries, "timeout": args.timeout}
     rpc = Rpc(args.rpc, **rpc_kwargs) if args.rpc else Rpc(**rpc_kwargs)
     records = load_existing(out_path)
+    state_path = pathlib.Path(args.state) if args.state else out_path.with_suffix(".scanned.json")
+    scanned_state = load_scanned(state_path)
     added = 0
     skipped = 0
     started = time.time()
 
     for n, seed in enumerate(seeds, 1):
         wallet = seed["wallet"]
+        done = scanned_state.get(wallet, -1)
+        if not args.force and done >= args.limit:
+            print(f"[{n}/{len(seeds)}] {wallet} — already scanned to {done}, skipping")
+            continue
         print(f"[{n}/{len(seeds)}] {wallet}")
         scan = collect_edges(
             rpc,
@@ -111,6 +137,9 @@ def main(argv: list[str] | None = None) -> int:
         if scan["stopped_early"]:
             print("  ! RPC appears to be rate limiting; stopping")
             break
+
+        scanned_state[wallet] = max(done, scan["scanned"])
+        save_scanned(state_path, scanned_state)
 
         clusters = build_clusters(scan["edges"], min_mints=args.min_mints)
         print(f"  scanned {scan['scanned']} txs, {len(clusters)} clusters")

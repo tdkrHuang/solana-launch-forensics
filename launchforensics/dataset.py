@@ -115,3 +115,29 @@ def seeds_from_transactions(items: list[tuple[str, dict]], *, min_creations: int
             }
         )
     return sorted(out, key=lambda s: (-s["creations_in_sample"], -s["sweeps_in_sample"], s["wallet"]))
+
+
+def seeds_from_creators(pairs: list[tuple[str, str]]) -> list[dict]:
+    """Seeds from ``(mint, creator)`` pairs resolved elsewhere.
+
+    A mint's oldest signature is its creation, and that transaction's fee
+    payer is the account that paid to launch it. Counting how many of the
+    sampled mints each payer launched is a cheap way to find wallets worth a
+    deeper scan, without walking a trade-dominated program log.
+    """
+    counts: dict[str, int] = {}
+    for mint, wallet in pairs:
+        if not mint or not wallet:
+            continue
+        counts[wallet] = counts.get(wallet, 0) + 1
+
+    out = [
+        {
+            "wallet": wallet,
+            "creations_in_sample": count,
+            "sweeps_in_sample": 0,
+            "evidence": "creation (oldest signature of the mint)",
+        }
+        for wallet, count in counts.items()
+    ]
+    return sorted(out, key=lambda s: (-s["creations_in_sample"], s["wallet"]))

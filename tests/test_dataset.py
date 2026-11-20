@@ -149,3 +149,15 @@ def test_seeds_keep_fee_collectors_even_without_a_creation():
 def test_seeds_ignore_transactions_without_pump_activity():
     items = [("x", fixtures.spl_initialize_mint_tx())]
     assert D.seeds_from_transactions(items) == []
+
+
+def test_seeds_from_creators_counts_sampled_mints():
+    pairs = [("m1", "w1"), ("m2", "w1"), ("m3", "w2"), ("", "w3"), ("m4", "")]
+    seeds = D.seeds_from_creators(pairs)
+    assert [s["wallet"] for s in seeds] == ["w1", "w2"]
+    assert seeds[0]["creations_in_sample"] == 2
+    assert seeds[0]["evidence"].startswith("creation")
+
+
+def test_seeds_from_creators_is_empty_without_pairs():
+    assert D.seeds_from_creators([]) == []

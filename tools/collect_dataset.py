@@ -62,7 +62,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", default="datasets/clusters.jsonl")
     parser.add_argument("--target", type=int, default=100, help="records to reach")
     parser.add_argument("--rounds", type=int, default=6, help="discovery rounds at most")
-    parser.add_argument("--sample", type=int, default=150, help="program txs per discovery round")
+    parser.add_argument("--sample", type=int, default=150, help="program txs per discovery page")
+    parser.add_argument("--pages", type=int, default=1, help="history pages per discovery round")
+    parser.add_argument("--source", choices=["program", "pools"], default="program")
+    parser.add_argument("--pools-pages", type=int, default=10, help="20 fresh pools per page")
     parser.add_argument("--limit", type=int, default=60, help="transactions scanned per seed")
     parser.add_argument("--min-confidence", choices=["low", "medium", "high"], default="medium")
     parser.add_argument("--sleep", type=int, default=20, help="seconds between rounds")
@@ -86,7 +89,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.dry_run:
         for r in range(1, args.rounds + 1):
-            print(f"  round {r}: discover --sample {args.sample}, build --limit {args.limit}")
+            print(
+                f"  round {r}: discover {args.source} "
+                f"(--sample {args.sample} x {args.pages}, --pools-pages {args.pools_pages}), "
+                f"build --limit {args.limit}"
+            )
         return 0
 
     child_env = os.environ.copy()
@@ -110,8 +117,9 @@ def main(argv: list[str] | None = None) -> int:
             break
 
         run(
-            [sys.executable, "tools/find_seeds.py", "--sample", str(args.sample),
-             "--merge", str(seeds_path)]
+            [sys.executable, "tools/find_seeds.py", "--source", args.source,
+             "--sample", str(args.sample), "--pages", str(args.pages),
+             "--pools-pages", str(args.pools_pages), "--merge", str(seeds_path)]
             + common,
             env=child_env,
         )
