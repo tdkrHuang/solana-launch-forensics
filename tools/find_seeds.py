@@ -34,9 +34,9 @@ PUMP_PROGRAM = A.PUMP_PROGRAM
 POOLS_URL = "https://api.geckoterminal.com/api/v2/networks/solana/new_pools"
 
 
-def _get_json(url: str, *, attempts: int = 4) -> dict:
+def _get_json(url: str, *, attempts: int = 5) -> dict:
     """GET with backoff. Public feeds rate limit, and a 429 is not a failure."""
-    delay = 5.0
+    delay = 8.0
     for attempt in range(1, attempts + 1):
         req = urllib.request.Request(
             url,
@@ -76,7 +76,7 @@ def new_pool_mints(pages: int, *, pump_only: bool = True) -> list[str]:
             if mint:
                 mints[mint] = None
         print(f"  pool page {page}: {len(rows)} pools, {len(mints)} pump mints", file=sys.stderr)
-        time.sleep(2.0)  # the public pool feed allows ~30 calls a minute
+        time.sleep(2.5)  # the public pool feed allows ~30 calls a minute
     return list(mints)
 
 

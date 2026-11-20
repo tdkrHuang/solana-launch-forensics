@@ -97,6 +97,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     child_env = os.environ.copy()
+    child_env["PYTHONUNBUFFERED"] = "1"
     if args.rpc:
         child_env["SOLANA_RPC_URL"] = args.rpc
     print("endpoint " + redact(child_env.get("SOLANA_RPC_URL", "(default)")))

@@ -176,8 +176,8 @@ unrelated wallets, so read the `funded` edges with that in mind; `created` and
 the exact command, the scan bound, the evidence counts and a confidence grade.
 The schema is documented in [`datasets/SCHEMA.md`](datasets/SCHEMA.md).
 
-As of 2026-11-20 the committed dataset holds **15 clusters covering
-545 mints**, 13 of them graded `high` (a creator-fee sweep proves
+As of 2026-11-21 the committed dataset holds **58 clusters covering
+1593 mints**, 41 of them graded `high` (a creator-fee sweep proves
 control). It is a sample of pump.fun activity, not a ranking of anyone; see the
 schema for how confidence is decided.
 

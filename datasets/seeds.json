@@ -5,6 +5,11 @@
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "28U7RcqyuF7oHzQhhF7x7NwHD1ySgMALHhKpedHnyx28",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "2Dmx6qBNeD3184nKGZFUhMmD5C4kR9pRiKdVTK1jN8sU",
     "source": "random sample of pump.fun activity, n=1000 txs, 7 creators",
     "notes": "1 creations, 0 fee collections in the sample"
@@ -13,6 +18,16 @@
     "wallet": "2KP9miexioqgNbjPwysggcbi3sKqhH8JsPaDmFxRPURD",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
     "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "2UcS1C7PoEodaZ4hBu3QjSBvTmii73AAPSuMFER4tfEb",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "2XLiBehMifx8ZUdcPeteFmdgVFvLyqdTJqum7kmYqfHR",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "2 creations, 0 fee collections in the sample"
   },
   {
     "wallet": "2YcyUh641YZaYTnxjxyHHb7QxdApiE3YjNybMMqyfang",
@@ -25,6 +40,16 @@
     "notes": "2 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "2ekvogH7UGLZuCqq2hzbersH8r2iHRsA7pLUgEiSMnkZ",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "2ianJS2Z8hSF3nkfEqKj8YwbjSct6GzEBXtnrXbxSvRJ",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "2k5hrzuykwyTbUe8L7UriYAQhr5hijNLgBvEB4B9pP5y",
     "source": "random sample of pump.fun activity, n=600 txs, 3 creators",
     "notes": "0 creations, 1 fee collections in the sample"
@@ -32,6 +57,16 @@
   {
     "wallet": "2ny9U8oe4DkNMvkM6GK7oALwP1JRgXdH3cEDqeEJVgvD",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "3cbuqqiTmcg8GD48uAaLH1NViQwUj8C1Czx9u3xozpaK",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "3dUBSz1FNrKJ2pev6bw2ZCRaUAEDng4HDafD9YzSpYpP",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -55,13 +90,33 @@
     "notes": "3 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "3zNWpeRBZY7c5eS5fYboheQP5juPqD525qixxbjiVhEQ",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "49gPb7WmoVjPaBYbUHDPaizG3vTgbp62rcipfFYj35KT",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "4TmLynHv1iKD5JwV1SeAZvvzTNhGAxMKmPp7Ghy9C3wf",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "4VxgCSAKUe1HUB1VFhimsKfR8TX5ugkkK5iccMaBXF6r",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "4gtaksjHVZgXAeu7nCg95NhdE42ewEWhEB5enaCcvqUZ",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "4im7vMhFizcsNFnete69oYkHqiWg7TA9vBxpcx5fk35p",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -72,6 +127,21 @@
   {
     "wallet": "5FAwzUoCr4TgrVdwENKqtsgubswmEzS427QaPhVG7Pav",
     "source": "random sample of pump.fun activity, n=1000 txs, 7 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "5pPVRhd73vxa2XDMmUv2ZAKxgw2WtHoMjbGjBkfyGKLJ",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "5xbtqSAaeN6yDWodF9uikRtKFT84jYH9MQF8wxT6B81t",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "2 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "5z6hiPbwY9yQbhdHzyhVmBVnrpT8EZ8nnEx8AX9oAZmm",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -105,6 +175,11 @@
     "notes": "1 creations, 1 fee collections in the sample"
   },
   {
+    "wallet": "6SPzVoqXGQDGcuCEpq8svTNG5JM6TbuqWjUTtSjxTdr",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "6ZDCWr2ne2ygTmSzps8yeDReaF6SP9MBSqLL8iaSkC6Q",
     "source": "random sample of pump.fun activity, n=900 txs, 4 creators",
     "notes": "1 creations, 0 fee collections in the sample"
@@ -130,8 +205,23 @@
     "notes": "4 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "7BiRrRqpBwrcaek79hiDuBLYWtcuHSu3yzbBVEUYoDgm",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "2 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "7ETWxhrz4cKDHDHzPK3fSisVRWCrnbBWgJtnQ8wVbyvi",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "7FVfSdnR9VPGjMtmBP1Hz9C2DFTpoNX8gVVRmnimnGt9",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "7MhvVfuoBKfa2iCeRDoGcZeYTayGuHkpYyPzBrgEpphY",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -142,6 +232,11 @@
   {
     "wallet": "7p4c7rBaDYHymU49QcNF1mtsEX4Pvs51fif7JJ2ha1Bh",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "7sWeanycEbyP46nseZ8opYUAfNfSDzYZ6TN8XbDNGTsE",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -157,6 +252,11 @@
   {
     "wallet": "8sDSmtXeo8Pq34TQCyHA2jAoab3TNP3YnFqahWay8s9s",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "9J9nj5a2JYBc3RqQMeKnnF1vyEvvWPhWKHch9BK69Mkt",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -178,6 +278,16 @@
     "wallet": "9kojcBF2tw88BDmNx4R4h1FsPwq9uuDmu6yqzARJN8Jg",
     "source": "random sample of pump.fun activity, n=400 txs, 4 creators",
     "notes": "0 creations, 1 fee collections in the sample"
+  },
+  {
+    "wallet": "9v9f5TK7Zp9XFV2TD2zosQQuUnuUn9PdpUDy5J73zrTY",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "A9EWcakF32qMtfQ3FNwBQMy5GepsaJwE23n25KgBihKg",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
   },
   {
     "wallet": "ANB3qUu9p3Sc9jFAvciKtDGVi7atR638wX1gi8NvpQ88",
@@ -215,13 +325,33 @@
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "BDg5wjRkTJ5bo63d9AqJPLtu2GYfXDJhrsY8PxrWsM2p",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "BJMoeRukDGe8prB3iQpay2DyPrT3t2675V8ib9YgsYpG",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "BL3FX5DRdYxEQeH9UriSnRdTfsLnUdV2G4XUM5CDC3Hu",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "BWSbCUMYs2KVKevh9GLQcX7b1qCgmDh5KQSCoJ2n8dM7",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "BYafh9HrBrYVF8dRcNYG3FBhfwnn3BhgTSCiNuYmLh4P",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "BaA7Z6bCjwic9dK2j7VfJKP5grDsTTrfF7VPm4Zn72hD",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -232,6 +362,11 @@
   {
     "wallet": "BprSsZHyvweK7HVkrezEeYLzUuiWRH5TKHhXKwsQU5FG",
     "source": "random sample of pump.fun activity, n=400 txs, 2 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "Brxy7GvPgmvb1W8TimgkNXHWB7fRssSkCDB6rtAuzEF3",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -265,6 +400,11 @@
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "CaLTDJ8jYcX4HZZVXt6TED3PR9PwQD7kFJ6WZ3t11cCj",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "2 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "CnTeYCBA7Hzj9r2s99SaEXKYpiWixtMUkqZWHwyNbm3g",
     "source": "random sample of pump.fun activity, n=400 txs, 4 creators",
     "notes": "0 creations, 1 fee collections in the sample"
@@ -295,6 +435,26 @@
     "notes": "0 creations, 1 fee collections in the sample"
   },
   {
+    "wallet": "DBF9VMwgJ5iPJ9yrGkLDw9PinLPvYLAULMpMv3F2VAFL",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "DDb4vLEkQs78Zs8yxsZuKFAG8C85k5cFmevbMjXxphkK",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "DV56RvPxUsptJnzNQbhPotjKdMyaTLQ1h5f9zgseXVuL",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "DXGjbdkayUHr43PohYFZBrpyK5i78qDpohrKBgSmMreU",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "11 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "DcSZid68EasD5TxpJrMYc1Zzrbv3fgjaRxGSJXFEK9c8",
     "source": "random sample of pump.fun activity, n=400 txs, 7 creators",
     "notes": "1 creations, 0 fee collections in the sample"
@@ -303,6 +463,11 @@
     "wallet": "DdiftP1FntfyKfEaDEuLoUtsfjbQBFJpqqm7dKxRjeeg",
     "source": "random sample of pump.fun activity, n=149 txs, 1 creators",
     "notes": "0 creations, 8 fee collections in the sample"
+  },
+  {
+    "wallet": "DhzU1KFZyPdPi7edQTDmAYLgbJYm4w89wzwgZB63AKNe",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
   },
   {
     "wallet": "DqMAVQ1RcQath18PrSLBVZHjwWXXN8cFEua2XuQ2rbQh",
@@ -332,6 +497,16 @@
   {
     "wallet": "EiJnS4fHH4EYNPiLzHFL3BiairYeopZtiELTPSDZHBcx",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "F2TYbuMZARdJUw398orMJHdpFskSX6vPynrgKFmfjgEq",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "FEfBWrQA9bhekK3zT21kDTDfkchvXppzkXa375Xc2ijJ",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -370,9 +545,34 @@
     "notes": "0 creations, 2 fee collections in the sample"
   },
   {
+    "wallet": "GM8tLq2RRn5d8ArXtbwrLpp3ZV9RBUxSjWxSJstqnfsr",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "GVczPwnN39gEApcNzra4j2fyk2Tzep4vd4qecUuqS6qb",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "GWpA8ezAue8H6SaacwhGEwzVNgbUCiQzJGXre2SSorew",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "GXNhdi8GxMcMEzTpk577Kb9eTipQSZhT3Hr2ohFwWZdM",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
     "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "GZWuXj34zHBsXuLKEQ4a2SNYLSbSYVPa7NTi2VrN2S9Z",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "GZfeyr8Y8GwbR8yLJ8eGpJ2ArYs6oZZx12w7ZXyGDHZD",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "2 creations, 0 fee collections in the sample"
   },
   {
     "wallet": "GtTg74ZpUbUgfNuQHLkVu4KWHxtfVzBWJp9k5S6c4W14",
@@ -380,8 +580,18 @@
     "notes": "84 creations in one day; nine identical 0.486609148 SOL payouts; seven-mint creator-fee sweep"
   },
   {
+    "wallet": "GvE4iNZeiNPFDkBwM1VqfhwRhYjxTj2MubJSTKjpjr44",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "GzVyJQ6y4zPndvcT78MbsWetqb2KBg1ErYxiHYHJkmUX",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "HDiXq1WHEm5jxS3p8MZbVPAUjvac5NW6i3WTTJGzSMjd",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
@@ -420,9 +630,19 @@
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
+    "wallet": "Mivzi6BdKaiLtisYRDVzxLUhgzBz5aPyBeTx69WJDcL",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "TPjsqQVG6XXHFfbpbBfrDz5sEYAW9XjYKoFjqDFN5a7",
     "source": "random sample of pump.fun activity, n=400 txs, 2 creators",
     "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "XJGrHeodTYMNGWPCUpxwwzK2YKHdDP1KCyTSsKPGX99",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "2 creations, 0 fee collections in the sample"
   },
   {
     "wallet": "YfQRsi28dpyuCcu6D3JdR1ogtgg835VuSGNSJDLucky",
@@ -435,8 +655,18 @@
     "notes": "0 creations, 1 fee collections in the sample"
   },
   {
+    "wallet": "haqq6qnVBCZt97amh9VUFZRFCkD6NJxoYifacCuqqqq",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
     "wallet": "kZn2QQ2JeGJfyHZgLMPMMuKo1tT148w1MJp1qpNGEfU",
     "source": "new pump.fun pools (GeckoTerminal), 98 mints sampled, 61 creators",
+    "notes": "1 creations, 0 fee collections in the sample"
+  },
+  {
+    "wallet": "w5TeXUZUnKbcaSwjnFLH8bfRFGAaofkV4Cvyk93q1MC",
+    "source": "new pump.fun pools (GeckoTerminal), 76 mints sampled, 56 creators",
     "notes": "1 creations, 0 fee collections in the sample"
   },
   {
