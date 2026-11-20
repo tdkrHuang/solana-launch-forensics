@@ -35,7 +35,7 @@ ASSOCIATED_TOKEN_PROGRAM = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
 LAMPORTS_PER_SOL = 1_000_000_000
 
 CREATE_INSTRUCTIONS = {"Create", "CreateV2"}
-SWEEP_INSTRUCTIONS = {"SweepCreatorFee", "CollectCreatorFeeV2"}
+SWEEP_INSTRUCTIONS = {"SweepCreatorFee", "CollectCreatorFee", "CollectCreatorFeeV2"}
 
 
 # -- accounts -------------------------------------------------------------
@@ -163,10 +163,10 @@ def create_count(tx: dict) -> int:
 def sweep_count(tx: dict) -> int:
     """Number of creator-fee collection calls.
 
-    ``SweepCreatorFee`` and ``CollectCreatorFeeV2`` can only be issued by a
-    mint's creator, so a sweep is ownership evidence, not a behavioural
-    guess. It is also easily confused with a creation when instructions are
-    counted without reading their names.
+    ``SweepCreatorFee``, ``CollectCreatorFee`` and ``CollectCreatorFeeV2`` can
+    only be issued by a mint's creator, so a sweep is ownership evidence, not
+    a behavioural guess. It is also easily confused with a creation when
+    instructions are counted without reading their names.
     """
     return sum(1 for name in pump_instruction_names(tx) if name in SWEEP_INSTRUCTIONS)
 

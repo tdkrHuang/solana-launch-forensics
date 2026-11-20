@@ -123,3 +123,29 @@ def test_pipeline_reports_an_empty_wallet():
     assert scan["requested"] == 0
     assert scan["edges"] == []
     assert scan["stopped_early"] is False
+
+
+# -- seed discovery --------------------------------------------------------
+def test_seeds_keep_creation_payers():
+    items = [
+        ("a", fixtures.single_create_tx(fixtures.MINT_A)),
+        ("b", fixtures.single_create_tx(fixtures.MINT_B)),
+    ]
+    seeds = D.seeds_from_transactions(items)
+    assert [s["wallet"] for s in seeds] == [fixtures.SIGNER]
+    assert seeds[0]["creations_in_sample"] == 2
+    assert seeds[0]["evidence"] == "creation"
+
+
+def test_seeds_keep_fee_collectors_even_without_a_creation():
+    items = [("s", fixtures.sweep_tx(3))]
+    seeds = D.seeds_from_transactions(items)
+    assert len(seeds) == 1
+    assert seeds[0]["sweeps_in_sample"] == 3
+    assert seeds[0]["creations_in_sample"] == 0
+    assert seeds[0]["evidence"] == "creator-fee collection"
+
+
+def test_seeds_ignore_transactions_without_pump_activity():
+    items = [("x", fixtures.spl_initialize_mint_tx())]
+    assert D.seeds_from_transactions(items) == []

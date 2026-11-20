@@ -57,6 +57,21 @@ python3 tools/build_dataset.py --seeds datasets/seeds.json --limit 200
   of duplicating.
 - Resumable: a rate-limited run stops and keeps what it already wrote.
 - Offline check: `--dry-run` validates the seed list without network access.
+- One scan per seed: a deeper re-scan replaces that seed's earlier records, so
+  the same wallet cannot appear twice with different mint sets.
+
+---
+
+## Finding seeds
+
+```bash
+python3 tools/find_seeds.py --sample 150 --merge datasets/seeds.json
+```
+
+Samples the newest transactions that touch pump.fun and keeps the fee payers
+that created a mint **or collected a creator fee**. A fee collector is by
+definition a creator, so sweeps count even when the creation falls outside the
+sampled window. The output is a sample of the window, not a ranking.
 
 ---
 

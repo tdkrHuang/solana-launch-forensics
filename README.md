@@ -177,9 +177,17 @@ the exact command, the scan bound, the evidence counts and a confidence grade.
 The schema is documented in [`datasets/SCHEMA.md`](datasets/SCHEMA.md).
 
 ```bash
+# find seed wallets by sampling recent pump.fun activity
+python3 tools/find_seeds.py --sample 150 --merge datasets/seeds.json
+
+# turn seeds into records
 python3 tools/build_dataset.py --seeds datasets/seeds.json --limit 200
 python3 tools/build_dataset.py --seeds datasets/seeds.json --dry-run
 ```
+
+Fee payers that create a mint, or collect a creator fee, become seeds. A fee
+collector is a creator by definition, so sweeps count even when the creation
+falls outside the sampled window.
 
 Grading is by the weakest link used to join the mints:
 

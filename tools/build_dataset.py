@@ -115,6 +115,7 @@ def main(argv: list[str] | None = None) -> int:
         clusters = build_clusters(scan["edges"], min_mints=args.min_mints)
         print(f"  scanned {scan['scanned']} txs, {len(clusters)} clusters")
 
+        fresh = []
         for cluster in clusters:
             rec = record(
                 cluster,
@@ -128,9 +129,21 @@ def main(argv: list[str] | None = None) -> int:
             if RANK[rec["confidence"]] < RANK[args.min_confidence]:
                 skipped += 1
                 continue
-            is_new = rec["cluster_id"] not in records
-            records[rec["cluster_id"]] = rec
-            added += 1 if is_new else 0
+            fresh.append(rec)
+
+        # One scan per seed: a deeper scan replaces what a shallower one found,
+        # so the same wallet cannot appear twice with different mint sets.
+        previous = [r for r in records.values() if r["seed_wallet"] == wallet]
+        best = max((r["scanned_transactions"] for r in previous), default=-1)
+        if fresh and scan["scanned"] >= best:
+            for r in previous:
+                records.pop(r["cluster_id"], None)
+            for rec in fresh:
+                if rec["cluster_id"] not in records:
+                    added += 1
+                records[rec["cluster_id"]] = rec
+        elif fresh:
+            print(f"  kept the earlier scan ({best} txs); this one saw {scan['scanned']}")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as fh:
