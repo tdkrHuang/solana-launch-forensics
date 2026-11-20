@@ -17,7 +17,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
+import re
 import subprocess
 import sys
 import time
@@ -39,9 +41,19 @@ def count_records(path: pathlib.Path, min_confidence: str) -> int:
     return total
 
 
-def run(cmd: list[str]) -> int:
-    print("\n$ " + " ".join(cmd), flush=True)
-    return subprocess.call(cmd, cwd=str(ROOT))
+SECRET = re.compile(r"(api-key=)[^&\s]+")
+
+
+def redact(text: str) -> str:
+    """Never print an API key, even inside a logged command line."""
+    return SECRET.sub(r"\1***", text)
+
+
+def run(cmd: list[str], env: dict[str, str] | None = None) -> int:
+    # Endpoints travel through the environment, not argv, so the key stays out
+    # of `ps` output on a shared machine.
+    print("\n$ " + redact(" ".join(cmd)), flush=True)
+    return subprocess.call(cmd, cwd=str(ROOT), env=env)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -77,8 +89,12 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  round {r}: discover --sample {args.sample}, build --limit {args.limit}")
         return 0
 
-    rpc_args = ["--rpc", args.rpc] if args.rpc else []
-    common = rpc_args + [
+    child_env = os.environ.copy()
+    if args.rpc:
+        child_env["SOLANA_RPC_URL"] = args.rpc
+    print("endpoint " + redact(child_env.get("SOLANA_RPC_URL", "(default)")))
+
+    common = [
         "--pause", str(args.pause),
         "--retries", str(args.retries),
         "--timeout", str(args.timeout),
@@ -95,14 +111,16 @@ def main(argv: list[str] | None = None) -> int:
 
         run(
             [sys.executable, "tools/find_seeds.py", "--sample", str(args.sample),
-             "--merge", str(seeds_path), "--json"]
-            + common
+             "--merge", str(seeds_path)]
+            + common,
+            env=child_env,
         )
         run(
             [sys.executable, "tools/build_dataset.py", "--seeds", str(seeds_path),
              "--out", str(args.out), "--limit", str(args.limit),
              "--min-confidence", args.min_confidence]
-            + common
+            + common,
+            env=child_env,
         )
 
         after = count_records(out_path, args.min_confidence)
