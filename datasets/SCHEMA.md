@@ -113,3 +113,32 @@ Add an object to `seeds.json`:
 
 Use public chain data only. Do not add wallets in order to identify a private
 individual; the purpose is to test the method.
+
+---
+
+## What the committed dataset contains
+
+Snapshot, 2026-11-21:
+
+| Measure | Value |
+|---|---|
+| clusters | 111 |
+| mints covered | 2,872 |
+| wallets | 230 |
+| graded `high` | 78 |
+| graded `medium` | 33 |
+| median cluster size | 16 mints |
+| largest cluster | 157 mints |
+| evidence edges | 2,561 `created`, 1,087 `swept`, 604 `funded` |
+
+Of 111 clusters, 70 hold ten or more mints and 18 hold fifty or more. The
+distribution is heavy-tailed: most wallets launch once, a small number launch
+continuously, and the dataset is aimed at the second group.
+
+### What it does not say
+
+- It does not say a cluster is fraudulent. It says mints share a paid creator,
+  or that one wallet collects their fees.
+- It is not exhaustive. Seeds come from a public pool feed over a few hours, so
+  the dataset is a sample of that window.
+- It does not identify people. Only public keys.

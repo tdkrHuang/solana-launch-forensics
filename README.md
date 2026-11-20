@@ -188,6 +188,9 @@ python3 tools/find_seeds.py --sample 150 --merge datasets/seeds.json
 # turn seeds into records
 python3 tools/build_dataset.py --seeds datasets/seeds.json --limit 200
 python3 tools/build_dataset.py --seeds datasets/seeds.json --dry-run
+
+# or loop discovery and scanning unattended until a target is reached
+python3 tools/collect_dataset.py --source pools --target 100 --limit 250
 ```
 
 Fee payers that create a mint, or collect a creator fee, become seeds. A fee
