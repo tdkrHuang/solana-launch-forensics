@@ -26,7 +26,7 @@ from .analytics import (
 from .cluster import build_clusters
 from .rpc import Rpc, RpcError
 
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 
 __all__ = [
     "Rpc",
