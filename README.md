@@ -25,6 +25,11 @@ uploaded — the page talks to a public RPC and renders the result.
 There is also a [sample report](https://tdkrhuang.github.io/solana-launch-forensics/sample-report.html)
 showing what the paid write-up looks like.
 
+## Writing
+
+- [A fee sweep is not a creation](https://dev.to/tdkrhuang/reading-solana-launch-logs-correctly-a-fee-sweep-is-not-a-creation-4gf4) — the two events, and why attribution needs the invoke stack
+- [One wallet, 108 launches in 9 hours](https://dev.to/tdkrhuang/one-wallet-108-launches-in-9-hours-what-a-fee-sweep-actually-proves-34b6) — a full cluster from the dataset, and what it cannot tell you
+
 ```
 $ launchforensics scan GtTg74Zp…4W14 --limit 60
 wallet          GtTg74Zp…4W14
