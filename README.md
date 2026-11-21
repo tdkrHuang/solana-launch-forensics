@@ -17,6 +17,14 @@ It answers four questions from public chain data alone:
 Every output line is traceable to a signature you can paste into an explorer.
 The tool never guesses intent.
 
+**Try it without installing anything:** paste a wallet into the
+[browser demo](https://tdkrhuang.github.io/solana-launch-forensics/demo/) and get the same
+created / swept / funded edges as the CLI. No API key, no wallet connection, nothing
+uploaded — the page talks to a public RPC and renders the result.
+
+There is also a [sample report](https://tdkrhuang.github.io/solana-launch-forensics/sample-report.html)
+showing what the paid write-up looks like.
+
 ```
 $ launchforensics scan GtTg74Zp…4W14 --limit 60
 wallet          GtTg74Zp…4W14

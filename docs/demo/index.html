@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Launch Forensics — browser demo</title>
+<meta name="description" content="Paste a Solana wallet and see which tokens it created and whose creator fees it collected. No install, no API key." />
+<style>
+  :root {
+    --bg: #0b0f17;
+    --panel: #121826;
+    --line: #1f2937;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --created: #3b82f6;
+    --swept: #10b981;
+    --both: #a78bfa;
+    --funded: #f59e0b;
+    --warn: #fbbf24;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: #7dd3fc; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 18px 64px; }
+  header h1 { font-size: 24px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  header p { margin: 0; color: var(--muted); max-width: 720px; }
+  .topnav { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .topnav a { margin-right: 14px; }
+
+  form.scan {
+    margin: 24px 0 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 10px;
+    align-items: center;
+  }
+  input[type="text"], select {
+    background: #0a0f19;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font: inherit;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    min-width: 0;
+  }
+  input[type="text"]::placeholder { color: #55637a; }
+  button {
+    background: #1d4ed8;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { background: #2563eb; }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  button.ghost:hover { background: #182033; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .advanced { grid-column: 1 / -1; display: none; gap: 10px; grid-template-columns: 1fr auto; }
+  .advanced.open { display: grid; }
+
+  .status { min-height: 22px; color: var(--muted); font-size: 13px; margin: 8px 2px 18px; }
+  .status.error { color: #fca5a5; }
+  .bar { height: 3px; background: #1b2334; border-radius: 2px; overflow: hidden; margin-top: 8px; display: none; }
+  .bar.on { display: block; }
+  .bar > i { display: block; height: 100%; width: 0; background: #38bdf8; transition: width 0.15s linear; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .card b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .card span { color: var(--muted); font-size: 12px; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } form.scan { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  .panel h2 { font-size: 14px; margin: 0 0 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .clusters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .clusters button { font-size: 12px; padding: 5px 10px; background: #0f1728; border: 1px solid var(--line); color: var(--text); font-weight: 500; }
+  .clusters button.on { border-color: #38bdf8; color: #7dd3fc; }
+
+  svg.graph { width: 100%; height: auto; display: block; background: #0a0f19; border-radius: 10px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; table-layout: fixed; }
+  th, td { text-align: left; padding: 7px 6px; border-bottom: 1px solid #1a2233; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  th { color: var(--muted); font-weight: 500; position: sticky; top: 0; background: var(--panel); }
+  .tablewrap { max-height: 560px; overflow-y: auto; margin: -2px -4px 0; padding: 0 4px; }
+  td.mono, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  tr.pick { background: #16213a; }
+  tbody tr { cursor: pointer; }
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+  .dot.created { background: var(--created); }
+  .dot.swept { background: var(--swept); }
+  .dot.both { background: var(--both); }
+  td .muted { color: #64748b; }
+
+  .detail { margin-top: 10px; font-size: 12.5px; color: var(--muted); min-height: 42px; }
+  .detail code { color: #cbd5e1; word-break: break-all; }
+
+  details.how { margin-top: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  details.how summary { cursor: pointer; font-weight: 600; }
+  details.how p, details.how li { color: var(--muted); font-size: 13.5px; }
+  .note { font-size: 12px; color: #fbbf24; margin-top: 10px; }
+  footer { margin-top: 26px; font-size: 12px; color: #64748b; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Launch forensics, in the browser</h1>
+    <p>
+      Paste a Solana wallet. The page reads its recent transactions and shows which tokens it
+      <b>created</b> and whose <b>creator fees</b> it collected. No install, no API key, nothing
+      leaves the browser except the RPC calls.
+    </p>
+    <div class="topnav">
+      <a href="https://github.com/tdkrHuang/solana-launch-forensics">source (MIT)</a>
+      <a href="../sample-report.html">sample report</a>
+      <a href="https://pypi.org/project/solana-launch-forensics/">pip package</a>
+    </div>
+  </header>
+
+  <form class="scan" id="scanForm">
+    <input id="wallet" type="text" spellcheck="false" autocomplete="off"
+           placeholder="wallet address, e.g. 6N7e1YN4JmgtMYcGXUCyBXfdpqxcqcZME7DXHHh8NiPc" />
+    <select id="depth" title="transactions to inspect">
+      <option value="50" selected>50 txs</option>
+      <option value="100">100 txs</option>
+      <option value="250">250 txs (slow)</option>
+    </select>
+    <button id="go" type="submit">Scan</button>
+    <div class="advanced" id="advanced">
+      <input id="rpc" type="text" spellcheck="false"
+             placeholder="custom RPC URL (optional)" />
+      <button class="ghost" id="toggleRpc" type="button">RPC</button>
+    </div>
+  </form>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
+    <button class="ghost" id="sample" type="button">Load sample cluster (117 mints)</button>
+    <button class="ghost" id="cancel" type="button" disabled>Cancel</button>
+    <button class="ghost" id="download" type="button" disabled>Download JSON</button>
+  </div>
+
+  <div class="status" id="status">Ready. A 50-transaction scan takes roughly 10–20 seconds on the free RPC.</div>
+  <div class="bar" id="bar"><i></i></div>
+
+  <section id="results" hidden>
+    <div class="cards" id="cards"></div>
+    <div class="layout">
+      <div class="panel">
+        <h2>Graph</h2>
+        <div class="clusters" id="clusterNav"></div>
+        <svg class="graph" id="graph" viewBox="0 0 800 620" role="img" aria-label="wallet and mint graph"></svg>
+        <div class="legend">
+          <span><i style="background:var(--created)"></i>created only</span>
+          <span><i style="background:var(--swept)"></i>swept only</span>
+          <span><i style="background:var(--both)"></i>created + swept</span>
+          <span><i style="background:var(--funded)"></i>wallet funded wallet</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Evidence</h2>
+        <div class="tablewrap">
+          <table>
+            <colgroup><col style="width:46%"><col style="width:23%"><col style="width:31%"></colgroup>
+            <thead><tr><th>mint</th><th>created</th><th>fee swept</th></tr></thead>
+            <tbody id="mintRows"></tbody>
+          </table>
+        </div>
+        <div class="detail" id="detail">Click a mint in the graph or the table for signatures.</div>
+        <div style="font-size:11.5px;color:#64748b;margin-top:6px">“—” means that event is older than the scanned window.</div>
+      </div>
+    </div>
+  </section>
+
+  <details class="how">
+    <summary>What this is counting, and what it cannot tell you</summary>
+    <p>
+      <b>created</b> means this wallet paid for the transaction that created the mint.
+      <b>swept</b> means this wallet collected that mint's creator fee
+      (<code>SweepCreatorFee</code>, <code>CollectCreatorFee</code>,
+      <code>CollectCreatorFeeV2</code>). Only the creator can collect its own fee, so a
+      sweep is ownership evidence — not a behavioural guess.
+    </p>
+    <p>
+      Two wallets are linked when one funded the other. That is a link, not proof: exchanges and
+      faucets fund thousands of unrelated wallets. Every edge keeps its signature so you can check
+      any single line in an explorer.
+    </p>
+    <p>
+      The page only sees the last N transactions, so a busy wallet's older launches are invisible here.
+      It does not tell you who sold, who profited, or whether a token was a scam. It reports what the
+      chain says.
+    </p>
+    <div class="note">
+      The default RPC is a free public endpoint. Large scans will be slow or rate-limited; paste your
+      own RPC URL under “RPC” if you have one.
+    </div>
+  </details>
+
+  <footer>
+    Same parsing rules as the CLI (<code>launchforensics 0.2.1</code>). Source:
+    <a href="https://github.com/tdkrHuang/solana-launch-forensics">github.com/tdkrHuang/solana-launch-forensics</a>.
+  </footer>
+</div>
+
+<script type="module">
+import {
+  buildClusters, edgesFromTx, isAddress, mintView, PUMP_PROGRAM,
+} from "./core.js";
+
+// Free endpoint that still serves versioned (v1) transactions with CORS.
+// Most public RPCs either block browser origins or reject v1, so the demo
+// defaults to one that works and lets the user paste their own under "RPC".
+const PUBLIC_RPC = "https://api.zan.top/solana-mainnet";
+const BATCH_SIZE = 5;
+const WORKERS = 3;
+const $ = (id) => document.getElementById(id);
+
+let controller = null;
+let result = null;
+let selectedCluster = 0;
+let selectedMint = null;
+
+function setStatus(text, isError = false) {
+  const el = $("status");
+  el.textContent = text;
+  el.classList.toggle("error", isError);
+}
+
+function setProgress(done, total) {
+  const bar = $("bar");
+  if (!total) { bar.classList.remove("on"); return; }
+  bar.classList.add("on");
+  bar.firstElementChild.style.width = `${Math.round((100 * done) / total)}%`;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// One JSON-RPC round trip. `payload` may be a single request or a batch.
+async function rpcPost(url, payload) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+    signal: controller?.signal,
+  });
+  if (res.status === 429) throw new Error("rate limited");
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function withRetry(fn, attempts = 4) {
+  let last;
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (err.name === "AbortError") throw err;
+      last = err;
+      await sleep(500 * (i + 1) + Math.random() * 300);
+    }
+  }
+  throw last;
+}
+
+async function getSignatures(url, wallet, limit) {
+  const json = await withRetry(() => rpcPost(url, {
+    jsonrpc: "2.0", id: 1, method: "getSignaturesForAddress", params: [wallet, { limit }],
+  }));
+  if (json.error) throw new Error(json.error.message || "RPC error");
+  return json.result ?? [];
+}
+
+async function scan(wallet, limit, url) {
+  setStatus("Reading signatures…");
+  const sigs = await getSignatures(url, wallet, limit);
+  if (!sigs.length) throw new Error("No transactions found for that address on this RPC.");
+
+  const edges = [];
+  let scanned = 0;
+  let failed = 0;
+  let stopped = false;
+  const txOpts = { encoding: "jsonParsed", maxSupportedTransactionVersion: 1 };
+
+  // Batches keep the request count low enough for a free endpoint. A batch of
+  // five is the largest that stayed reliable in testing.
+  const batches = [];
+  for (let i = 0; i < sigs.length; i += BATCH_SIZE) batches.push(sigs.slice(i, i + BATCH_SIZE));
+
+  async function runBatch(batch) {
+    const payload = batch.map((sig, i) => ({
+      jsonrpc: "2.0", id: i, method: "getTransaction", params: [sig.signature, txOpts],
+    }));
+    let json;
+    try {
+      json = await withRetry(() => rpcPost(url, payload), 3);
+    } catch (err) {
+      if (err.name === "AbortError") throw err;
+      failed += batch.length;
+      return;
+    }
+    if (!Array.isArray(json)) {
+      // Server does not implement JSON-RPC batching; fail clearly rather than
+      // silently recording zero transactions.
+      throw new Error("This RPC does not support batch requests. Paste another RPC URL.");
+    }
+    for (let i = 0; i < batch.length; i += 1) {
+      const item = json.find((r) => r.id === i);
+      if (item?.result) {
+        scanned += 1;
+        edges.push(...edgesFromTx(item.result, batch[i]));
+      } else {
+        failed += 1;
+      }
+    }
+  }
+
+  let cursor = 0;
+  async function worker() {
+    while (cursor < batches.length) {
+      if (controller?.signal.aborted) return;
+      const batch = batches[cursor];
+      cursor += 1;
+      await runBatch(batch);
+      const done = Math.min(scanned + failed, sigs.length);
+      setProgress(done, sigs.length);
+      setStatus(`Reading transactions… ${done}/${sigs.length}${failed ? ` (${failed} failed)` : ""}`);
+      if (failed > 20 && failed * 4 > scanned) { stopped = true; return; }
+    }
+  }
+
+  await Promise.all(Array.from({ length: WORKERS }, worker));
+  return { edges, scanned, failed, stopped, requested: sigs.length, wallet, rpc: url };
+}
+
+function short(addr, head = 6, tail = 5) {
+  return addr.length <= head + tail + 1 ? addr : `${addr.slice(0, head)}…${addr.slice(-tail)}`;
+}
+
+function fmtTime(ts) {
+  if (!ts) return "—";
+  const iso = new Date(ts * 1000).toISOString();
+  return iso.slice(0, 4) === String(new Date().getUTCFullYear())
+    ? iso.slice(5, 16).replace("T", " ")
+    : iso.slice(0, 16).replace("T", " ");
+}
+
+function fmtClock(ts) {
+  return ts ? new Date(ts * 1000).toISOString().slice(11, 16) : "—";
+}
+
+function fmtGap(seconds) {
+  if (seconds < 0 || seconds > 60 * 60 * 24 * 30) return "—";
+  if (seconds < 90) return `${Math.round(seconds)}s`;
+  if (seconds < 5400) return `${Math.round(seconds / 60)}m`;
+  if (seconds < 60 * 60 * 48) return `${(seconds / 3600).toFixed(1)}h`;
+  return `${(seconds / 86400).toFixed(1)}d`;
+}
+
+function solscan(kind, value) {
+  return `https://solscan.io/${kind}/${value}`;
+}
+
+function render() {
+  const clusters = result.clusters;
+  $("results").hidden = false;
+
+  const totalMints = new Set(clusters.flatMap((c) => c.mints)).size;
+  const totalWallets = new Set(clusters.flatMap((c) => c.wallets)).size;
+  const created = clusters.reduce((n, c) => n + (c.links.created ?? 0), 0);
+  const swept = clusters.reduce((n, c) => n + (c.links.swept ?? 0), 0);
+  const funded = clusters.reduce((n, c) => n + (c.links.funded ?? 0), 0);
+
+  $("cards").innerHTML = [
+    [result.scanned, "transactions read"],
+    [clusters.length, clusters.length === 1 ? "cluster" : "clusters"],
+    [totalMints, "mints"],
+    [totalWallets, "wallets"],
+    [created, "creations"],
+    [swept, "fee sweeps"],
+    [funded, "wallet→wallet funding"],
+  ].map(([v, label]) => `<div class="card"><b>${v}</b><span>${label}</span></div>`).join("");
+
+  $("clusterNav").innerHTML = clusters.slice(0, 8).map((c, i) =>
+    `<button data-i="${i}" class="${i === selectedCluster ? "on" : ""}">#${i + 1} · ${c.mints.length} mints</button>`
+  ).join("");
+
+  renderGraph();
+  renderTable();
+  $("download").disabled = false;
+}
+
+function renderGraph() {
+  const svg = $("graph");
+  const cluster = result.clusters[selectedCluster];
+  svg.innerHTML = "";
+  if (!cluster) return;
+
+  const mints = mintView(cluster);
+  const wallets = cluster.wallets;
+  const cx = 400;
+  const cy = 310;
+  const ring = 245;
+  const ns = "http://www.w3.org/2000/svg";
+
+  const walletPos = new Map();
+  if (wallets.length === 1) {
+    walletPos.set(wallets[0], [cx, cy]);
+  } else {
+    wallets.forEach((w, i) => {
+      const a = (2 * Math.PI * i) / wallets.length - Math.PI / 2;
+      walletPos.set(w, [cx + 95 * Math.cos(a), cy + 95 * Math.sin(a)]);
+    });
+  }
+
+  const shown = mints.slice(0, 120);
+  const pos = new Map();
+  shown.forEach((row, i) => {
+    const a = (2 * Math.PI * i) / shown.length - Math.PI / 2;
+    pos.set(row.mint, [cx + ring * Math.cos(a), cy + ring * Math.sin(a)]);
+  });
+
+  const gEdges = document.createElementNS(ns, "g");
+  for (const [wallet, [wx, wy]] of walletPos) {
+    for (const row of shown) {
+      const p = pos.get(row.mint);
+      if (!p) continue;
+      const hasCreated = Boolean(row.created);
+      const hasSwept = Boolean(row.swept);
+      const line = document.createElementNS(ns, "line");
+      line.setAttribute("x1", wx); line.setAttribute("y1", wy);
+      line.setAttribute("x2", p[0]); line.setAttribute("y2", p[1]);
+      line.setAttribute("stroke", hasCreated && hasSwept ? "var(--both)" : hasSwept ? "var(--swept)" : "var(--created)");
+      line.setAttribute("stroke-opacity", "0.35");
+      line.setAttribute("stroke-width", "0.8");
+      gEdges.appendChild(line);
+    }
+  }
+
+  for (const [wallet, [wx, wy]] of walletPos) {
+    const circle = document.createElementNS(ns, "circle");
+    circle.setAttribute("cx", wx); circle.setAttribute("cy", wy);
+    circle.setAttribute("r", 8);
+    circle.setAttribute("fill", "#e5e7eb");
+    const title = document.createElementNS(ns, "title");
+    title.textContent = wallet;
+    circle.appendChild(title);
+    gEdges.appendChild(circle);
+
+    const label = document.createElementNS(ns, "text");
+    label.setAttribute("x", wx); label.setAttribute("y", wy + 26);
+    label.setAttribute("fill", "#e5e7eb");
+    label.setAttribute("font-size", "11");
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("font-family", "ui-monospace, monospace");
+    label.textContent = short(wallet, 5, 4);
+    gEdges.appendChild(label);
+  }
+
+  for (const row of shown) {
+    const [x, y] = pos.get(row.mint);
+    const circle = document.createElementNS(ns, "circle");
+    circle.setAttribute("cx", x); circle.setAttribute("cy", y);
+    circle.setAttribute("r", selectedMint === row.mint ? 6 : 4);
+    circle.setAttribute("fill", row.created && row.swept ? "var(--both)" : row.swept ? "var(--swept)" : "var(--created)");
+    circle.setAttribute("stroke", selectedMint === row.mint ? "#fff" : "none");
+    circle.style.cursor = "pointer";
+    const title = document.createElementNS(ns, "title");
+    title.textContent = `${row.mint}\n${row.created ? "created " + fmtTime(row.created.block_time) : "no creation seen"}\n${row.swept ? "fee swept " + fmtTime(row.swept.block_time) : "no sweep seen"}`;
+    circle.appendChild(title);
+    circle.addEventListener("click", () => { selectedMint = row.mint; renderGraph(); renderTable(); showDetail(row); });
+    gEdges.appendChild(circle);
+  }
+
+  svg.appendChild(gEdges);
+  const note = document.createElementNS(ns, "text");
+  note.setAttribute("x", cx); note.setAttribute("y", cy + 300);
+  note.setAttribute("fill", "#64748b");
+  note.setAttribute("font-size", "11");
+  note.setAttribute("text-anchor", "middle");
+  note.textContent = mints.length > shown.length ? `showing ${shown.length} of ${mints.length} mints` : "";
+  svg.appendChild(note);
+}
+
+function renderTable() {
+  const cluster = result.clusters[selectedCluster];
+  const rows = mintView(cluster ?? { edges: [] });
+  $("mintRows").innerHTML = rows.slice(0, 60).map((row) => {
+    const both = row.created && row.swept;
+    const kind = both ? "both" : row.swept ? "swept" : "created";
+    const sweptText = both
+      ? `${fmtClock(row.swept.block_time)} <span class="muted">+${fmtGap(row.swept.block_time - row.created.block_time)}</span>`
+      : fmtTime(row.swept?.block_time);
+    return `<tr data-mint="${row.mint}" class="${row.mint === selectedMint ? "pick" : ""}">
+      <td class="mono"><span class="dot ${kind}"></span>${short(row.mint, 10, 6)}</td>
+      <td>${fmtTime(row.created?.block_time)}</td>
+      <td>${sweptText}</td>
+    </tr>`;
+  }).join("") + (rows.length > 60 ? `<tr><td colspan="3" style="color:#64748b">${rows.length - 60} more not shown</td></tr>` : "");
+
+  for (const tr of $("mintRows").querySelectorAll("tr[data-mint]")) {
+    tr.addEventListener("click", () => {
+      const mint = tr.dataset.mint;
+      selectedMint = mint;
+      const row = rows.find((r) => r.mint === mint);
+      renderGraph(); renderTable(); showDetail(row);
+    });
+  }
+}
+
+function showDetail(row) {
+  if (!row) return;
+  const parts = [`<code>${row.mint}</code>`];
+  if (row.created) {
+    parts.push(`created · <a href="${solscan("tx", row.created.signature)}" target="_blank" rel="noopener">${short(row.created.signature, 10, 8)}</a>`);
+  }
+  if (row.swept) {
+    parts.push(`fee swept · <a href="${solscan("tx", row.swept.signature)}" target="_blank" rel="noopener">${short(row.swept.signature, 10, 8)}</a>`);
+  }
+  parts.push(`<a href="${solscan("token", row.mint)}" target="_blank" rel="noopener">token on Solscan</a>`);
+  $("detail").innerHTML = parts.join("<br>");
+}
+
+function applyScan(scanResult) {
+  const clusters = buildClusters(scanResult.edges, { minMints: 2 });
+  result = { ...scanResult, clusters };
+  selectedCluster = 0;
+  selectedMint = null;
+  $("detail").textContent = "Click a mint in the graph or the table for signatures.";
+
+  if (!clusters.length) {
+    setStatus("Scanned, but no cluster with two or more mints was found in this window.");
+    $("results").hidden = true;
+    return;
+  }
+  render();
+  const biggest = clusters[0];
+  setStatus(
+    `Done: ${scanResult.scanned} txs read, ${clusters.length} ${clusters.length === 1 ? "cluster" : "clusters"}, ${biggest.mints.length} mints in the largest` +
+    (scanResult.stopped ? " (stopped early: RPC errors)" : "")
+  );
+}
+
+$("scanForm").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const wallet = $("wallet").value.trim();
+  if (!isAddress(wallet)) { setStatus("That does not look like a Solana address.", true); return; }
+  if (wallet === PUMP_PROGRAM) { setStatus("That is the pump.fun program, not a wallet.", true); return; }
+
+  controller = new AbortController();
+  $("go").disabled = true;
+  $("cancel").disabled = false;
+  $("results").hidden = true;
+  selectedCluster = 0;
+  selectedMint = null;
+  try {
+    const url = ($("rpc").value.trim() || PUBLIC_RPC);
+    const scanResult = await scan(wallet, Number($("depth").value), url);
+    applyScan(scanResult);
+  } catch (err) {
+    if (err.name === "AbortError") setStatus("Cancelled.");
+    else if (err instanceof TypeError) setStatus("Could not reach the RPC (CORS or network). Try another RPC URL under “RPC”.", true);
+    else setStatus(`Scan failed: ${err.message}`, true);
+  } finally {
+    $("go").disabled = false;
+    $("cancel").disabled = true;
+    $("bar").classList.remove("on");
+    controller = null;
+  }
+});
+
+$("cancel").addEventListener("click", () => controller?.abort());
+
+$("toggleRpc").addEventListener("click", () => $("advanced").classList.toggle("open"));
+
+$("clusterNav").addEventListener("click", (ev) => {
+  const btn = ev.target.closest("button[data-i]");
+  if (!btn) return;
+  selectedCluster = Number(btn.dataset.i);
+  selectedMint = null;
+  render();
+});
+
+$("sample").addEventListener("click", async () => {
+  setStatus("Loading sample…");
+  try {
+    const res = await fetch("./sample-cluster.json");
+    const sample = await res.json();
+    applyScan(sample);
+    $("wallet").value = sample.wallet;
+  } catch (err) {
+    setStatus(`Could not load the sample: ${err.message}`, true);
+  }
+});
+
+$("download").addEventListener("click", () => {
+  if (!result) return;
+  const blob = new Blob([JSON.stringify({
+    wallet: result.wallet,
+    rpc: result.rpc,
+    scanned: result.scanned,
+    failed: result.failed,
+    requested: result.requested,
+    stopped_early: result.stopped,
+    edge_counts: result.edges.reduce((acc, e) => (acc[e.type] = (acc[e.type] ?? 0) + 1, acc), {}),
+    clusters: result.clusters.map((c) => ({
+      mints: c.mints, wallets: c.wallets, links: c.links,
+      first_block_time: c.first_block_time, last_block_time: c.last_block_time,
+      edges: c.edges,
+    })),
+  }, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `cluster-${result.wallet.slice(0, 8)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+$("wallet").value = "6N7e1YN4JmgtMYcGXUCyBXfdpqxcqcZME7DXHHh8NiPc";
+
+// ?sample=1 loads the bundled cluster, which makes the page useful in a link
+// and gives automated checks something to render without hitting an RPC.
+if (new URLSearchParams(location.search).has("sample")) {
+  $("sample").click();
+}
+</script>
+</body>
+</html>

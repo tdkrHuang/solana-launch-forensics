@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>solana-launch-forensics</title>
+<style>
+  :root { --bg:#0b0f17; --panel:#121826; --line:#1f2937; --text:#e5e7eb; --muted:#94a3b8; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:64px 20px; }
+  h1 { font-size:30px; letter-spacing:-0.02em; margin:0 0 10px; }
+  p { color:var(--muted); }
+  .cards { display:grid; gap:12px; margin-top:28px; }
+  a.card { display:block; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px; text-decoration:none; color:var(--text); }
+  a.card:hover { border-color:#38bdf8; }
+  a.card b { display:block; font-size:16px; margin-bottom:3px; }
+  a.card span { color:var(--muted); font-size:13.5px; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; background:#0a0f19; border:1px solid var(--line); padding:2px 6px; border-radius:6px; }
+  footer { margin-top:36px; font-size:12.5px; color:#64748b; }
+  footer a { color:#7dd3fc; text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>solana-launch-forensics</h1>
+  <p>
+    Read-only forensics for pump.fun style launches. Standard library only, MIT,
+    every output line traceable to a transaction signature.
+  </p>
+  <p><code>pip install solana-launch-forensics</code></p>
+
+  <div class="cards">
+    <a class="card" href="./demo/">
+      <b>Browser demo →</b>
+      <span>Paste a wallet, see which tokens it created and whose creator fees it collected. No install, no API key.</span>
+    </a>
+    <a class="card" href="./sample-report.html">
+      <b>Sample report →</b>
+      <span>What the paid write-up looks like: 96 launches, funding chain, payout reconstruction.</span>
+    </a>
+    <a class="card" href="https://github.com/tdkrHuang/solana-launch-forensics">
+      <b>Source on GitHub →</b>
+      <span>CLI, dataset schema, tests. MIT licensed.</span>
+    </a>
+    <a class="card" href="https://pypi.org/project/solana-launch-forensics/">
+      <b>PyPI →</b>
+      <span>Installs with pip or uv, Python 3.10+.</span>
+    </a>
+  </div>
+
+  <footer>
+    Reports: DM <a href="https://x.com/tdkr_Huang">@tdkr_Huang</a>. Payment in USDC (Solana) or JPY bank transfer.
+  </footer>
+</div>
+</body>
+</html>

@@ -7,6 +7,10 @@ This is the unedited opening of a real report. The paid version adds the full
 token table, funding-chain depth, payout reconstruction and a reproducibility
 appendix.
 
+You can reproduce the created / swept edges yourself in the
+[browser demo](https://tdkrhuang.github.io/solana-launch-forensics/demo/) — paste any wallet,
+no install or API key.
+
 ---
 
 ## Scope
