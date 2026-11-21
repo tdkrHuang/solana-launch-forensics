@@ -28,7 +28,7 @@ The goal is reproducibility, not volume. A reader should be able to take a
 | `tool_version` | string | package version |
 | `method` | string | the exact command |
 | `source` | string | where the seed came from |
-| `notes` | string | free text, optional |
+| `notes` | string | provenance note. `seed sample: …` counts the discovery sample, not the cluster scan — compare `links` for what the scan found |
 
 ---
 

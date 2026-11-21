@@ -179,9 +179,12 @@ def _merge_and_report(found: list[dict], source: str, args, *, failed: int = 0) 
     added = 0
     for entry in found:
         current = known.get(entry["wallet"])
+        # This counts the seed-discovery sample, not the cluster scan. Without
+        # the prefix a record reads as if its cluster had one creation while
+        # its `links` object says 108, which looks like a contradiction.
         notes = (
-            f"{entry['creations_in_sample']} creations, "
-            f"{entry['sweeps_in_sample']} fee collections in the sample"
+            f"seed sample: {entry['creations_in_sample']} creations, "
+            f"{entry['sweeps_in_sample']} fee collections"
         )
         if current is None:
             seeds.append({"wallet": entry["wallet"], "source": source, "notes": notes})
