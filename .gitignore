@@ -10,4 +10,5 @@ venv/
 !tests/fixtures.json
 !tests/fixtures/demo_txs.json
 !docs/demo/sample-cluster.json
+!docs/demo/sample-cluster-funded.json
 !datasets/seeds.json

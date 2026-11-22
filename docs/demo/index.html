@@ -119,6 +119,9 @@
   details.how p, details.how li { color: var(--muted); font-size: 13.5px; }
   .note { font-size: 12px; color: #fbbf24; margin-top: 10px; }
   footer { margin-top: 26px; font-size: 12px; color: #64748b; }
+  .offer { margin-top: 22px; }
+  .offer p { margin: 0 0 10px; color: var(--muted); font-size: 13.5px; }
+  .offer b { color: var(--text); }
 </style>
 </head>
 <body>
@@ -154,9 +157,11 @@
   </form>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
-    <button class="ghost" id="sample" type="button">Load sample cluster (117 mints)</button>
+    <button class="ghost" id="sample" type="button">Example: 117 mints, 1 wallet</button>
+    <button class="ghost" id="sample2" type="button">Example: 73 mints, 2 wallets</button>
     <button class="ghost" id="cancel" type="button" disabled>Cancel</button>
     <button class="ghost" id="download" type="button" disabled>Download JSON</button>
+    <button class="ghost" id="share" type="button" disabled>Copy link</button>
   </div>
 
   <div class="status" id="status">Ready. A 50-transaction scan takes roughly 10–20 seconds on the free RPC.</div>
@@ -215,6 +220,24 @@
       own RPC URL under “RPC” if you have one.
     </div>
   </details>
+
+  <section class="panel offer">
+    <h2>Need this for one wallet, in a form you can hand to someone else?</h2>
+    <p>
+      The demo shows what a wallet did in its last few hundred transactions. A written report
+      covers one wallet properly: creator, funding chain, where the SOL went, authorities and
+      remaining position — each line carrying a signature.
+    </p>
+    <p style="margin-bottom:6px">
+      <b>Lite $99</b> · 48 hours &nbsp;·&nbsp; <b>Standard $299</b> · 72 hours &nbsp;·&nbsp;
+      <b>Deep $699</b> · 5 business days
+    </p>
+    <p>
+      <a href="../sample-report.html">See the format</a> &nbsp;·&nbsp;
+      <a href="https://github.com/tdkrHuang/solana-launch-forensics/issues">Open an issue</a> &nbsp;·&nbsp;
+      <a href="https://x.com/tdkr_Huang">DM @tdkr_Huang</a>
+    </p>
+  </section>
 
   <footer>
     Same parsing rules as the CLI. Source:
@@ -553,6 +576,7 @@ function applyScan(scanResult) {
     return;
   }
   render();
+  $("share").disabled = false;
   const biggest = clusters[0];
   setStatus(
     `Done: ${scanResult.scanned} txs read, ${clusters.length} ${clusters.length === 1 ? "cluster" : "clusters"}, ${biggest.mints.length} mints in the largest` +
@@ -600,15 +624,35 @@ $("clusterNav").addEventListener("click", (ev) => {
   render();
 });
 
-$("sample").addEventListener("click", async () => {
-  setStatus("Loading sample…");
+async function loadSample(path) {
+  setStatus("Loading example…");
   try {
-    const res = await fetch("./sample-cluster.json");
+    const res = await fetch(path);
     const sample = await res.json();
     applyScan(sample);
     $("wallet").value = sample.wallet;
+    $("share").disabled = false;
   } catch (err) {
-    setStatus(`Could not load the sample: ${err.message}`, true);
+    setStatus(`Could not load the example: ${err.message}`, true);
+  }
+}
+
+$("sample").addEventListener("click", () => loadSample("./sample-cluster.json"));
+$("sample2").addEventListener("click", () => loadSample("./sample-cluster-funded.json"));
+
+// A link that reproduces exactly what the sender is looking at. Every public
+// reply can carry one, which is the only distribution left when DM is limited.
+$("share").addEventListener("click", async () => {
+  const wallet = (result?.wallet || $("wallet").value || "").trim();
+  if (!isAddress(wallet)) return;
+  const url = `${location.origin}${location.pathname}?wallet=${wallet}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    setStatus("Link copied — it opens this page and scans that wallet.");
+  } catch {
+    $("wallet").value = url;
+    $("wallet").select();
+    setStatus("Copy failed; the link is selected in the box above.", true);
   }
 });
 
@@ -639,8 +683,17 @@ $("wallet").value = "6N7e1YN4JmgtMYcGXUCyBXfdpqxcqcZME7DXHHh8NiPc";
 
 // ?sample=1 loads the bundled cluster, which makes the page useful in a link
 // and gives automated checks something to render without hitting an RPC.
-if (new URLSearchParams(location.search).has("sample")) {
+// ?wallet=<address> runs the scan immediately, so a shared link reproduces
+// exactly what the sender saw.
+const params = new URLSearchParams(location.search);
+const shared = (params.get("wallet") || "").trim();
+if (params.get("sample") === "2") {
+  $("sample2").click();
+} else if (params.has("sample")) {
   $("sample").click();
+} else if (isAddress(shared)) {
+  $("wallet").value = shared;
+  $("scanForm").requestSubmit();
 }
 </script>
 </body>

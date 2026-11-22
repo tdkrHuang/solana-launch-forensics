@@ -20,7 +20,8 @@ The tool never guesses intent.
 **Try it without installing anything:** paste a wallet into the
 [browser demo](https://tdkrhuang.github.io/solana-launch-forensics/demo/) and get the same
 created / swept / funded edges as the CLI. No API key, no wallet connection, nothing
-uploaded — the page talks to a public RPC and renders the result.
+uploaded — the page talks to a public RPC and renders the result. A shared link
+(`?wallet=<address>`) opens the page and runs that scan immediately.
 
 There is also a [sample report](https://tdkrhuang.github.io/solana-launch-forensics/sample-report.html)
 showing what the paid write-up looks like.
