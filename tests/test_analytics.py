@@ -106,12 +106,21 @@ def test_sol_balance_deltas():
 
 
 # -- summary --------------------------------------------------------------
-def test_summarize_flags_multi_create():
+def test_repeated_create_logs_do_not_make_a_creation():
+    # Seven Create lines, no token program InitializeMint: nothing was created.
     info = A.summarize(fixtures.batch_create_tx(creates=7))
-    assert info["creates_mints"] is True
+    assert info["creates_mints"] is False
     assert info["creates"] == 7
+    assert info["created_mints"] == []
     assert info["pump_invocations"] == 7
     assert info["err"] is None
+
+
+def test_bought_mint_in_a_create_tx_is_not_created():
+    info = A.summarize(fixtures.create_and_buy_tx())
+    assert info["creates"] == 1
+    assert info["created_mints"] == [fixtures.MINT_A]
+    assert set(info["mints"]) == {fixtures.MINT_A, fixtures.MINT_B}
 
 
 def test_summarize_flags_repeated_ops_without_creates():
@@ -126,6 +135,7 @@ def test_summarize_single_is_quiet():
     assert info["creates_mints"] is False
     assert info["batches_ops"] is False
     assert info["creates"] == 1
+    assert info["created_mints"] == [fixtures.MINT_A]
 
 
 def test_format_sol_trims_trailing_zeros():

@@ -77,12 +77,12 @@ def record(
 
 
 def seeds_from_transactions(items: list[tuple[str, dict]], *, min_creations: int = 1) -> list[dict]:
-    """Wallets that created or swept a mint in a sample of transactions.
+    """Wallets that created a mint in a sample of transactions.
 
-    Used to find seed wallets without guessing: sample recent activity of a
-    launch program, keep the accounts that paid for a creation or collected a
-    creator fee. A fee collector is by definition a creator, so sweeps count
-    even when the creation itself is outside the sampled window.
+    Only creations count. A fee collection cannot identify a creator: the
+    pump.fun program lets any signer submit ``CollectCreatorFee``, so the
+    payer of a sweep is whoever paid to trigger it, often a bot, not the
+    owner of the mint.
 
     The result is a sample of whoever was active in the window, not a ranking
     of anyone and not an accusation.
@@ -94,24 +94,24 @@ def seeds_from_transactions(items: list[tuple[str, dict]], *, min_creations: int
         payer = info["fee_payer"]
         if not payer:
             continue
-        if info["creates"] > 0:
-            creations[payer] = creations.get(payer, 0) + info["creates"]
+        made = len(info["created_mints"]) if info["creates"] else 0
+        if made:
+            creations[payer] = creations.get(payer, 0) + made
         collected = A.sweep_count(tx)
         if collected:
             sweeps[payer] = sweeps.get(payer, 0) + collected
 
     out = []
-    for wallet in set(creations) | set(sweeps):
-        made = creations.get(wallet, 0)
-        took = sweeps.get(wallet, 0)
-        if made < min_creations and not took:
+    for wallet in creations:
+        made = creations[wallet]
+        if made < min_creations:
             continue
         out.append(
             {
                 "wallet": wallet,
                 "creations_in_sample": made,
-                "sweeps_in_sample": took,
-                "evidence": "creation" if made else "creator-fee collection",
+                "sweeps_in_sample": sweeps.get(wallet, 0),
+                "evidence": "creation",
             }
         )
     return sorted(out, key=lambda s: (-s["creations_in_sample"], -s["sweeps_in_sample"], s["wallet"]))

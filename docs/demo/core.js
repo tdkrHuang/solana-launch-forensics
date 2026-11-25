@@ -109,6 +109,27 @@ export function tokenMintsInTx(tx) {
   return found;
 }
 
+// A mint can only be created once, by the token program's InitializeMint.
+// pump.fun's Create performs one, but a bundled create-and-buy transaction
+// also touches the mint it buys — counting touched mints as creations credits
+// the buyer with someone else's token.
+export function createdMints(tx) {
+  const found = [];
+  const seen = new Set();
+  for (const ix of allInstructions(tx)) {
+    if (ix?.programId !== TOKEN_PROGRAM && ix?.programId !== TOKEN_2022_PROGRAM) continue;
+    const parsed = ix?.parsed;
+    if (!parsed || typeof parsed !== "object") continue;
+    if (parsed.type !== "initializeMint" && parsed.type !== "initializeMint2") continue;
+    const mint = parsed?.info?.mint;
+    if (mint && !seen.has(mint)) {
+      seen.add(mint);
+      found.push(mint);
+    }
+  }
+  return found;
+}
+
 export function sweptMints(tx) {
   return sweepCount(tx) ? tokenMintsInTx(tx) : [];
 }
@@ -152,7 +173,7 @@ export function edgesFromTx(tx, where) {
     block_time: where.blockTime ?? null,
   };
   if (createCount(tx) > 0) {
-    for (const mint of tokenMintsInTx(tx)) {
+    for (const mint of createdMints(tx)) {
       edges.push({ type: "created", wallet: payer, mint, ...base });
     }
   }
@@ -169,6 +190,18 @@ export function edgesFromTx(tx, where) {
     });
   }
   return edges;
+}
+
+// Anyone can submit a fee collection for someone else's mint, so a sweep only
+// counts when the same wallet also created that mint in this scan. Without the
+// pairing it is a payment, not evidence of ownership.
+export function keepSweepsWithCreations(edges) {
+  const created = new Set(
+    edges.filter((e) => e.type === "created").map((e) => `${e.wallet}|${e.mint}`),
+  );
+  return edges.filter(
+    (e) => e.type !== "swept" || created.has(`${e.wallet}|${e.mint}`),
+  );
 }
 
 class UnionFind {

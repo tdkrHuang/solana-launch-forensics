@@ -85,6 +85,24 @@ def batch_create_tx(creates: int = 7, mints=None, split_sol: float = 0.486609) -
     }
 
 
+def create_and_buy_tx(created: str = MINT_A, bought: str = MINT_B) -> dict:
+    """A real shape that used to break attribution: create one mint, buy another.
+
+    Both mints appear in the account list, so anything that counts pump-suffixed
+    keys as creations credits the buyer with a mint it never created.
+    """
+    tx = single_create_tx(created)
+    tx["transaction"]["message"]["accountKeys"] = _keys(SIGNER, created, bought)
+    tx["meta"]["preBalances"] = [1_000_000_000, 0, 0]
+    tx["meta"]["postBalances"] = [999_995_000, 0, 0]
+    tx["meta"]["logMessages"] = tx["meta"]["logMessages"] + [
+        f"Program {PUMP_PROGRAM} invoke [1]",
+        "Program log: Instruction: Buy",
+        f"Program {PUMP_PROGRAM} success",
+    ]
+    return tx
+
+
 def create_tx_v0() -> dict:
     """A real-shaped pump.fun CreateV2 transaction.
 
@@ -180,6 +198,16 @@ def sweep_tx(count: int = 7) -> dict:
     }
 
 
+def _initialize_mint_ix(mint: str) -> dict:
+    """The token-program instruction that actually creates a mint."""
+    return {
+        "programId": TOKEN_PROGRAM,
+        "parsed": {"type": "initializeMint", "info": {"mint": mint, "decimals": 6, "mintAuthority": SIGNER}},
+        "program": "spl-token",
+        "stackHeight": 2,
+    }
+
+
 def single_create_tx(mint: str = MINT_A) -> dict:
     return {
         "slot": 312_004_890,
@@ -198,10 +226,15 @@ def single_create_tx(mint: str = MINT_A) -> dict:
             "err": None,
             "preBalances": [1_000_000_000, 0],
             "postBalances": [999_995_000, 0],
-            "innerInstructions": [],
+            "innerInstructions": [
+                {"index": 0, "instructions": [_initialize_mint_ix(mint)]}
+            ],
             "logMessages": [
                 f"Program {PUMP_PROGRAM} invoke [1]",
                 "Program log: Instruction: Create",
+                f"Program {TOKEN_PROGRAM} invoke [2]",
+                "Program log: Instruction: InitializeMint",
+                f"Program {TOKEN_PROGRAM} success",
                 f"Program {PUMP_PROGRAM} success",
             ],
         },

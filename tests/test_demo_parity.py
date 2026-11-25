@@ -37,10 +37,11 @@ def _python_view(tx: dict) -> dict:
         "fee_payer": info["fee_payer"],
         "creates": info["creates"],
         "mints": sorted(info["mints"]),
+        "created": sorted(info["created_mints"]),
         "swept": sorted(A.swept_mints(tx)),
         "funding": sorted([[f["from"], f["to"], f["lamports"]] for f in A.funding_inflows(tx)]),
         "pump": info["pump_instructions"],
-        "created_edges": sorted(info["mints"]) if info["creates"] else [],
+        "created_edges": sorted(info["created_mints"]) if info["creates"] else [],
     }
 
 

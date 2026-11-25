@@ -3,7 +3,7 @@
 // separate script because the demo must stay importable from a static page.
 import fs from "node:fs";
 import {
-  feePayer, createCount, tokenMintsInTx, sweptMints, fundingInflows,
+  feePayer, createCount, tokenMintsInTx, createdMints, sweptMints, fundingInflows,
   pumpInstructionNames, edgesFromTx,
 } from "../docs/demo/core.js";
 
@@ -13,6 +13,7 @@ const out = txs.map((tx, i) => ({
   fee_payer: feePayer(tx),
   creates: createCount(tx),
   mints: tokenMintsInTx(tx).sort(),
+  created: createdMints(tx).sort(),
   swept: sweptMints(tx).sort(),
   funding: fundingInflows(tx).map((f) => [f.from, f.to, f.lamports]).sort(),
   pump: pumpInstructionNames(tx),

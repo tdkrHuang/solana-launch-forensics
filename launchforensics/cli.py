@@ -70,10 +70,10 @@ def cmd_scan(args: argparse.Namespace) -> int:
             "mints": info["mints"],
             "err": info["err"],
         }
-        if info["creates"] >= 2:
+        if len(info["created_mints"]) >= 2:
             batches.append(entry)
 
-        for mint in info["mints"]:
+        for mint in info["created_mints"]:
             if mint in creations:
                 continue
             creations[mint] = {

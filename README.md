@@ -29,7 +29,7 @@ showing what the paid write-up looks like.
 ## Writing
 
 - [A fee sweep is not a creation](https://dev.to/tdkrhuang/reading-solana-launch-logs-correctly-a-fee-sweep-is-not-a-creation-4gf4) — the two events, and why attribution needs the invoke stack
-- [One wallet, 108 launches in 9 hours](https://dev.to/tdkrhuang/one-wallet-108-launches-in-9-hours-what-a-fee-sweep-actually-proves-34b6) — a full cluster from the dataset, and what it cannot tell you
+- [One wallet, 108 launches in 9 hours](https://dev.to/tdkrhuang/one-wallet-108-launches-in-9-hours-what-a-fee-sweep-actually-proves-34b6) — the case write-up; **its creation count predates the 2026-11-25 fix** and a correction is appended
 - [How to find the dev wallet of a pump.fun token](https://dev.to/tdkrhuang/how-to-find-the-dev-wallet-of-a-pumpfun-token-and-verify-it-yourself-oe9) — creator vs funder vs first buyer, and why walking a popular mint backwards does not work
 
 ```
@@ -136,8 +136,8 @@ signed facts:
 
 | Edge | Meaning |
 |---|---|
-| `created` | the wallet paid for the transaction that created the mint |
-| `swept` | the wallet collected that mint's creator fee — only the creator can |
+| `created` | the token program created the mint in a transaction this wallet paid for |
+| `swept` | the wallet submitted a fee collection for a mint it also created in this scan |
 | `funded` | SOL moved from one wallet to another |
 
 Connected components containing at least two mints are printed together, with the
@@ -191,10 +191,11 @@ unrelated wallets, so read the `funded` edges with that in mind; `created` and
 the exact command, the scan bound, the evidence counts and a confidence grade.
 The schema is documented in [`datasets/SCHEMA.md`](datasets/SCHEMA.md).
 
-As of 2026-11-21 the committed dataset holds **58 clusters covering
-1593 mints**, 41 of them graded `high` (a creator-fee sweep proves
-control). It is a sample of pump.fun activity, not a ranking of anyone; see the
-schema for how confidence is decided.
+**The committed dataset predates the 2026-11-25 attribution fix and must not be
+used.** It credited a transaction with every pump mint it touched, so mints that
+were only bought inside a create transaction were counted as creations. The
+records are kept for comparison while the scan is rebuilt; see
+[Correction](#correction-2026-11-25).
 
 ```bash
 # find seed wallets by sampling recent pump.fun activity
@@ -208,15 +209,15 @@ python3 tools/build_dataset.py --seeds datasets/seeds.json --dry-run
 python3 tools/collect_dataset.py --source pools --target 100 --limit 250
 ```
 
-Fee payers that create a mint, or collect a creator fee, become seeds. A fee
-collector is a creator by definition, so sweeps count even when the creation
-falls outside the sampled window.
+Only fee payers that create a mint become seeds. A fee collection cannot
+identify a creator: any signer can submit `CollectCreatorFee` for someone
+else's mint, and bots do exactly that.
 
 Grading is by the weakest link used to join the mints:
 
 | Grade | Condition |
 |---|---|
-| `high` | at least one `swept` edge — only a creator can collect the fee |
+| `high` | a creation plus a fee collection on the same mint by the same wallet |
 | `medium` | two or more `created` edges from one wallet |
 | `low` | joined only by funding transfers (dropped by default) |
 
@@ -238,18 +239,37 @@ returns `1`.
 
 **2. Touching a mint is not creating it.**
 
-A creator-fee sweep references seven mints and contains zero creations:
+A transaction can create one mint and buy three others; all four appear in its
+account list. Attribution therefore comes from the token program's
+`InitializeMint` instruction, not from the pump suffix. On a 250-transaction scan
+of one wallet this changed the count from 76 to 48 creations.
 
-```
-$ launchforensics tx zWcwg1pBsstXjKUw…whEq
-pump ops    SweepCreatorFee x7, CollectCreatorFeeV2
-creates     0
-mints       7 referenced
-```
+**3. Paying for a fee collection is not owning the mint.**
 
-That distinction matters: a sweep across seven mints proves one wallet controls the
-creator-fee accounts of all seven. Calling it "seven launches in one transaction"
-would be wrong, and a reviewer will check.
+`CollectCreatorFee` and its variants are permissionless: the creator's fee
+destination is fixed by the mint, but any signer may submit the collection and
+pay its fee. The payer of a sweep is often a bot. A sweep is shown only when the
+same wallet also created the mint in the same scan, and even then it is
+corroboration, not proof of intent.
+
+---
+
+## Correction (2026-11-25)
+
+Before this date the parser attributed every pump-suffixed account in a
+transaction to its fee payer. Because pump.fun creators bundle a `Create` with
+buys of other tokens, that counted purchased mints as launches and made the
+dataset, the demo sample and two articles overstate their numbers.
+
+The fix:
+
+- `created` edges come from the token program's `initializeMint` instruction.
+- `swept` edges are kept only when the same wallet also has a `created` edge for
+  that mint in the same window.
+- Seeds come from creations only.
+
+The API is unchanged; the numbers are smaller and reproducible. If you quoted a
+count from this project before 2026-11-25, re-run it.
 
 ---
 
@@ -351,8 +371,9 @@ python3 -m pytest -q
 Fixtures in `tests/fixtures.py` mirror real responses, including a versioned
 transaction **without `message.header`** and a Token-2022 `InitializeMint2` nested
 inside a pump.fun call. `tests/test_cluster.py` covers the graph rules: a single
-mint is never a cluster, shared funding joins two wallets, a sweep joins mints to
-the sweeper, and duplicate links collapse without duplicating mints.
+mint is never a cluster, shared funding joins two wallets, a sweep without a
+matching creation is dropped, and duplicate links collapse without duplicating
+mints.
 
 ---
 

@@ -58,7 +58,7 @@ def collect_edges(
             "block_time": sig.get("blockTime"),
         }
         if payer and info["creates"] > 0:
-            for mint in info["mints"]:
+            for mint in info["created_mints"]:
                 edges.append({"type": "created", "wallet": payer, "mint": mint, **where})
         if payer:
             for mint in A.swept_mints(tx):
@@ -76,6 +76,15 @@ def collect_edges(
 
         if i % 20 == 0:
             say(f"  {i}/{len(sigs)} transactions")
+
+    # A sweep is only evidence when the same wallet also created the mint in
+    # this window. Anyone can submit a fee collection for someone else's mint,
+    # so a sweep on its own says nothing about who controls the mint.
+    created = {(e["wallet"], e["mint"]) for e in edges if e["type"] == "created"}
+    edges = [
+        e for e in edges
+        if e["type"] != "swept" or (e["wallet"], e["mint"]) in created
+    ]
 
     return {
         "edges": edges,

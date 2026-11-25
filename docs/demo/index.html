@@ -4,11 +4,11 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>pump.fun dev wallet checker — launch forensics demo</title>
-<meta name="description" content="Paste a Solana wallet and see which pump.fun tokens it created and whose creator fees it collected. Runs in the browser against a public RPC — no install, no API key, nothing uploaded." />
+<meta name="description" content="Paste a Solana wallet and see which pump.fun tokens it created, and which of those fees it also collected. Runs in the browser against a public RPC — no install, no API key, nothing uploaded." />
 <link rel="canonical" href="https://tdkrhuang.github.io/solana-launch-forensics/demo/" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="pump.fun dev wallet checker" />
-<meta property="og:description" content="Paste a wallet: created, swept, funded — with the signature behind every line." />
+<meta property="og:description" content="Paste a wallet: created, then self-collected, then funded — with the signature behind every line." />
 <meta property="og:url" content="https://tdkrhuang.github.io/solana-launch-forensics/demo/" />
 <style>
   :root {
@@ -139,7 +139,7 @@
     <h1>pump.fun launch forensics, in the browser</h1>
     <p>
       Paste a Solana wallet. The page reads its recent pump.fun transactions and shows which
-      tokens it <b>created</b> and whose <b>creator fees</b> it collected. No install, no API key, nothing
+      tokens it <b>created</b>, and which of those creator fees it also <b>collected</b>. No install, no API key, nothing
       leaves the browser except the RPC calls.
     </p>
     <div class="topnav">
@@ -166,7 +166,7 @@
   </form>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
-    <button class="ghost" id="sample" type="button">Example: 117 mints, 1 wallet</button>
+    <button class="ghost" id="sample" type="button">Example: 31 mints, 1 wallet</button>
     <button class="ghost" id="sample2" type="button">Example: 73 mints, 2 wallets</button>
     <button class="ghost" id="cancel" type="button" disabled>Cancel</button>
     <button class="ghost" id="download" type="button" disabled>Download JSON</button>
@@ -208,11 +208,16 @@
   <details class="how">
     <summary>What this is counting, and what it cannot tell you</summary>
     <p>
-      <b>created</b> means this wallet paid for the transaction that created the mint.
-      <b>swept</b> means this wallet collected that mint's creator fee
-      (<code>SweepCreatorFee</code>, <code>CollectCreatorFee</code>,
-      <code>CollectCreatorFeeV2</code>). Only the creator can collect its own fee, so a
-      sweep is ownership evidence — not a behavioural guess.
+      <b>created</b> means the token program created the mint in a transaction this wallet
+      paid for. A transaction that creates one token often buys others: those mints appear
+      beside it in the same transaction but are not creations, and are not counted here.
+    </p>
+    <p>
+      <b>swept</b> means this wallet submitted a fee collection for a mint it also created
+      in this scan (<code>SweepCreatorFee</code>, <code>CollectCreatorFee</code>,
+      <code>CollectCreatorFeeV2</code>). Collection is permissionless — any signer can
+      trigger it, and bots do — so a sweep on its own says nothing about who owns the mint.
+      It appears here only when the same wallet also created the mint.
     </p>
     <p>
       Two wallets are linked when one funded the other. That is a link, not proof: exchanges and
@@ -237,16 +242,16 @@
     <p>
       The creator is the wallet that paid for the transaction containing the <code>Create</code>
       instruction. On a fresh token that transaction is the mint's first transaction, so it is the
-      oldest signature on the mint — expensive to reach on a token that has been trading for hours.
-      The cheaper route is the reverse: look for the mint's creator-fee collection, which only the
-      creator can perform and which happens near the top of the mint's history.
+      oldest signature on the mint — expensive to reach once the token has been trading for hours.
+      A fee collection does not answer the question: it is permissionless, and the signer is often
+      a bot rather than the creator. This page therefore starts from a wallet, not a token.
     </p>
 
     <h3>Is it the creator, or just the first buyer?</h3>
     <p>
-      A buy is not a creation. If the wallet only bought the token, its edge will be absent here,
-      and any "dev wallet" claim built on a buy should be rejected. A fee sweep is the part that
-      cannot be faked: the pump.fun program enforces that only the mint's creator collects its fee.
+      A buy is not a creation. A transaction can create one token and buy three others, and all
+      four appear in its account list. This page counts only mints the token program actually
+      initialised, so a wallet that merely bought the token is not shown as its creator.
     </p>
 
     <h3>Can two wallets be the same creator?</h3>
@@ -273,7 +278,7 @@
     <p class="more">
       Background:
       <a href="https://dev.to/tdkrhuang/how-to-find-the-dev-wallet-of-a-pumpfun-token-and-verify-it-yourself-oe9">how to find the dev wallet</a> ·
-      <a href="https://dev.to/tdkrhuang/one-wallet-108-launches-in-9-hours-what-a-fee-sweep-actually-proves-34b6">the 108-launch case</a> ·
+      <a href="https://dev.to/tdkrhuang/one-wallet-108-launches-in-9-hours-what-a-fee-sweep-actually-proves-34b6">the case write-up (correction appended)</a> ·
       <a href="https://dev.to/tdkrhuang/reading-solana-launch-logs-correctly-a-fee-sweep-is-not-a-creation-4gf4">reading the logs</a>
     </p>
   </section>
@@ -304,7 +309,7 @@
 
 <script type="module">
 import {
-  buildClusters, edgesFromTx, isAddress, mintView, PUMP_PROGRAM,
+  buildClusters, edgesFromTx, isAddress, keepSweepsWithCreations, mintView, PUMP_PROGRAM,
 } from "./core.js";
 
 // Free endpoint that still serves versioned (v1) transactions with CORS.
@@ -621,8 +626,9 @@ function showDetail(row) {
 }
 
 function applyScan(scanResult) {
-  const clusters = buildClusters(scanResult.edges, { minMints: 2 });
-  result = { ...scanResult, clusters };
+  const edges = keepSweepsWithCreations(scanResult.edges);
+  const clusters = buildClusters(edges, { minMints: 2 });
+  result = { ...scanResult, edges, clusters };
   selectedCluster = 0;
   selectedMint = null;
   $("detail").textContent = "Click a mint in the graph or the table for signatures.";

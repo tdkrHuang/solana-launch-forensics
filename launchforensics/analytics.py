@@ -214,6 +214,32 @@ def token_mints_in_tx(tx: dict) -> list[str]:
     return list(found)
 
 
+def created_mints(tx: dict) -> list[str]:
+    """Mints *created* by the transaction.
+
+    The ground truth is the token program's ``initializeMint`` instruction: a
+    mint can only be created once, and only that instruction creates it. Every
+    pump.fun ``Create`` performs one, so a transaction that also buys an
+    existing token is not credited with creating it.
+
+    ``token_mints_in_tx`` is deliberately broader — it lists mints the
+    transaction *touches* — and must not be used for attribution. A bundled
+    create-and-buy transaction touches two mints and creates one.
+    """
+    found: dict[str, None] = {}
+    for ix in all_instructions(tx):
+        if ix.get("programId") not in (TOKEN_PROGRAM, TOKEN_2022_PROGRAM):
+            continue
+        parsed = ix.get("parsed")
+        if not isinstance(parsed, dict):
+            continue
+        if parsed.get("type") in {"initializeMint", "initializeMint2"}:
+            mint = (parsed.get("info") or {}).get("mint")
+            if mint:
+                found[mint] = None
+    return list(found)
+
+
 # -- value flow -----------------------------------------------------------
 def system_transfers(tx: dict) -> list[dict]:
     """SOL transfers as ``{source, destination, lamports}``."""
@@ -326,7 +352,8 @@ def summarize(tx: dict) -> dict:
         "repeated_ops": repeated,
         "creates": creates,
         "mints": mints,
-        "creates_mints": creates >= 2,
+        "created_mints": created_mints(tx),
+        "creates_mints": len(created_mints(tx)) >= 2,
         "batches_ops": bool(repeated),
         "transfers": len(system_transfers(tx)),
         "equal_size_outflows": equal_size_outflows(tx),

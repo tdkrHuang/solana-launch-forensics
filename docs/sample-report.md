@@ -1,7 +1,13 @@
-# Sample report — one wallet, 96 launches across three days
+# Sample report — one wallet, three days of launches
 
 **Case 01 (public preview)** · Analysis 2026-11-16, updated 2026-11-20
 Network: Solana mainnet-beta · Method: public RPC only
+
+> **Correction, 2026-11-25.** The creation counts in this preview predate an
+> attribution fix: transactions were credited with every pump mint they touched,
+> including mints they only bought. The format below is unchanged; the figures are
+> being recomputed before the next paid report. The sweep paragraph has been
+> corrected in place.
 
 This is the unedited opening of a real report. The paid version adds the full
 token table, funding-chain depth, payout reconstruction and a reproducibility
@@ -86,8 +92,10 @@ CREATES   0
 ```
 
 A naive parser reports "7 creations in one transaction". That is wrong, and a
-reviewer will catch it. The correct reading is stronger: **seven tokens in one
-sweep proves one wallet controls all seven creator-fee accounts.**
+reviewer will catch it. The correct reading is narrower: **one wallet paid to
+submit a fee collection for seven mints.** Collection is permissionless, so this
+proves payment, not ownership; whether the same wallet created the mints is a
+separate question, answered only by the creation transactions.
 
 Verified again on 2026-11-20 with the tool in this repository; the output above
 is the current output, not a stored screenshot.

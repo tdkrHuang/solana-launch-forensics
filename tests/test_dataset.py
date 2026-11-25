@@ -106,6 +106,19 @@ def test_pipeline_collects_creation_edges():
     assert scan["edges"][0]["signature"] == "one"
 
 
+def test_pipeline_ignores_a_mint_the_wallet_only_bought():
+    rpc = FakeRpc({"one": fixtures.create_and_buy_tx(fixtures.MINT_A, fixtures.MINT_B)})
+    scan = collect_edges(rpc, "wallet", limit=10)
+    created = [e["mint"] for e in scan["edges"] if e["type"] == "created"]
+    assert created == [fixtures.MINT_A]
+
+
+def test_pipeline_drops_a_sweep_without_a_creation():
+    rpc = FakeRpc({"s": fixtures.sweep_tx(3)})
+    scan = collect_edges(rpc, "wallet", limit=10)
+    assert [e for e in scan["edges"] if e["type"] == "swept"] == []
+
+
 def test_pipeline_survives_a_failed_transaction():
     rpc = FakeRpc(
         {"one": fixtures.single_create_tx(fixtures.MINT_A), "two": fixtures.single_create_tx(fixtures.MINT_B)},
@@ -137,13 +150,10 @@ def test_seeds_keep_creation_payers():
     assert seeds[0]["evidence"] == "creation"
 
 
-def test_seeds_keep_fee_collectors_even_without_a_creation():
+def test_seeds_ignore_fee_collectors_without_a_creation():
+    # A sweep proves someone paid to collect, not that they created anything.
     items = [("s", fixtures.sweep_tx(3))]
-    seeds = D.seeds_from_transactions(items)
-    assert len(seeds) == 1
-    assert seeds[0]["sweeps_in_sample"] == 3
-    assert seeds[0]["creations_in_sample"] == 0
-    assert seeds[0]["evidence"] == "creator-fee collection"
+    assert D.seeds_from_transactions(items) == []
 
 
 def test_seeds_ignore_transactions_without_pump_activity():

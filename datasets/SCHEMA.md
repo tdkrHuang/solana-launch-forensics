@@ -36,9 +36,14 @@ The goal is reproducibility, not volume. A reader should be able to take a
 
 | Grade | Condition | Why |
 |---|---|---|
-| `high` | `links.swept >= 1` | only a mint's creator can collect its creator fee, so control is proven |
+| `high` | at least one mint with both `created` and `swept` by the same wallet | the wallet launched the mint and submitted its fee collection; both signatures are in the record |
 | `medium` | no sweep, `links.created >= 2` | one wallet paid to create both mints; strong but not exclusive |
 | `low` | joined only by `funded` edges | exchanges and faucets fund unrelated wallets; not counted as a cluster |
+
+> **2026-11-25:** records committed before this date were built with the old
+> attribution, which counted every pump mint touched by a create transaction.
+> Rebuild before quoting any count from them. `swept` now requires a matching
+> `created` edge from the same wallet, because fee collection is permissionless.
 
 `tools/build_dataset.py` drops `low` by default (`--min-confidence medium`).
 
@@ -125,11 +130,11 @@ Snapshot, 2026-11-21:
 | clusters | 111 |
 | mints covered | 2,872 |
 | wallets | 230 |
-| graded `high` | 78 |
+| graded `high` (pre-fix) | 78 |
 | graded `medium` | 33 |
 | median cluster size | 16 mints |
 | largest cluster | 157 mints |
-| evidence edges | 2,561 `created`, 1,087 `swept`, 604 `funded` |
+| evidence edges (pre-fix) | 2,561 `created`, 1,087 `swept`, 604 `funded` |
 
 Of 111 clusters, 70 hold ten or more mints and 18 hold fifty or more. The
 distribution is heavy-tailed: most wallets launch once, a small number launch

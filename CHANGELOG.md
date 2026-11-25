@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.3.1 — 2026-11-25
+
+### Fixed
+
+- **Creations are read from the token program's `initializeMint`, not from every
+  pump-suffixed account in the transaction.** A pump.fun transaction that
+  creates one token usually buys others, and the old code credited the payer
+  with all of them. On a 250-transaction scan this changed 76 attributed mints
+  to 48 actual creations, which inflated the dataset, the demo sample and two
+  articles. Records built before this version must be regenerated.
+- **A fee collection is not ownership evidence.** Collection is permissionless:
+  any signer can submit `CollectCreatorFee`, and bots do. A `swept` edge is now
+  kept only when the same wallet also created that mint in the same scan, and it
+  is corroboration, not proof.
+
+### Changed
+
+- Seed discovery uses creations only. A fee payer is not a seed unless it
+  created something.
+- `summarize()` exposes `created_mints`; `creates_mints` is based on it.
+
 ## 0.3.0 — 2026-11-21
 
 ### Fixed
