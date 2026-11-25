@@ -7,9 +7,10 @@ mints, and whose edges are individual, signed facts:
     ``wallet -> mint``. The wallet paid for the transaction that created it.
 
 ``swept``
-    ``wallet -> mint``. The wallet collected that mint's creator fee. Only a
-    mint's creator can do this, so the edge is ownership evidence rather than
-    a behavioural guess.
+    ``wallet -> mint``. The wallet submitted a collection of that mint's creator
+    fee, and the same wallet also created the mint in the same scan. Collection
+    is permissionless, so on its own it is a payment, not ownership evidence;
+    it is kept as corroboration of a creation that is already in the graph.
 
 ``funded``
     ``wallet -> wallet``. SOL moved from one wallet to the other. Shared

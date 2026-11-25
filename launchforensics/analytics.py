@@ -163,10 +163,12 @@ def create_count(tx: dict) -> int:
 def sweep_count(tx: dict) -> int:
     """Number of creator-fee collection calls.
 
-    ``SweepCreatorFee``, ``CollectCreatorFee`` and ``CollectCreatorFeeV2`` can
-    only be issued by a mint's creator, so a sweep is ownership evidence, not
-    a behavioural guess. It is also easily confused with a creation when
-    instructions are counted without reading their names.
+    ``SweepCreatorFee``, ``CollectCreatorFee`` and ``CollectCreatorFeeV2`` move
+    a mint's accrued creator fee to the destination fixed at creation. The
+    destination is the creator's; the signer is not necessarily. Collection is
+    permissionless, so a sweep says who paid to collect, not who created the
+    mint. It is also easily confused with a creation when instructions are
+    counted without reading their names.
     """
     return sum(1 for name in pump_instruction_names(tx) if name in SWEEP_INSTRUCTIONS)
 
