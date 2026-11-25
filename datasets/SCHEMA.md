@@ -123,22 +123,26 @@ individual; the purpose is to test the method.
 
 ## What the committed dataset contains
 
-Snapshot, 2026-11-21:
+Snapshot, 2026-11-26 (rebuilt after the attribution fix):
 
 | Measure | Value |
 |---|---|
-| clusters | 111 |
-| mints covered | 2,872 |
-| wallets | 230 |
-| graded `high` (pre-fix) | 78 |
-| graded `medium` | 33 |
-| median cluster size | 16 mints |
-| largest cluster | 157 mints |
-| evidence edges (pre-fix) | 2,561 `created`, 1,087 `swept`, 604 `funded` |
+| clusters | 27 |
+| mints covered | 1,224 |
+| wallets | 27 |
+| graded `high` | 24 |
+| graded `medium` | 3 |
+| median cluster size | 40 mints |
+| largest cluster | 146 mints |
+| evidence edges | 1,224 `created`, 327 `swept`, 149 `funded` |
 
-Of 111 clusters, 70 hold ten or more mints and 18 hold fifty or more. The
+Of 27 clusters, 26 hold ten or more mints and 6 hold fifty or more. The
 distribution is heavy-tailed: most wallets launch once, a small number launch
 continuously, and the dataset is aimed at the second group.
+
+Thirty seeds were rescanned at 250 transactions each; three produced no cluster
+of two or more mints and are absent. The previous snapshot (111 clusters, 2,872
+mints) was built with the old attribution and is kept only in git history.
 
 ### What it does not say
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2 — 2026-11-26
+
+### Fixed
+
+- `launchforensics.__version__` said `0.3.0` in the 0.3.1 release while the
+  package metadata said `0.3.1`. Dataset records built with 0.3.1 were stamped
+  with the old number. A test now pins the two together.
+
 ## 0.3.1 — 2026-11-25
 
 ### Fixed

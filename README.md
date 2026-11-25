@@ -191,11 +191,14 @@ unrelated wallets, so read the `funded` edges with that in mind; `created` and
 the exact command, the scan bound, the evidence counts and a confidence grade.
 The schema is documented in [`datasets/SCHEMA.md`](datasets/SCHEMA.md).
 
-**The committed dataset predates the 2026-11-25 attribution fix and must not be
-used.** It credited a transaction with every pump mint it touched, so mints that
-were only bought inside a create transaction were counted as creations. The
-records are kept for comparison while the scan is rebuilt; see
-[Correction](#correction-2026-11-25).
+Rebuilt on 2026-11-26 with the fixed attribution: **27 clusters covering 1,224
+mints**, 24 graded `high` (a creation plus a self-collected fee on the same
+mint), median 40 mints, largest 146. Thirty seed wallets were rescanned at 250
+transactions each; three produced no cluster of two or more mints. Every record
+names `launchforensics 0.3.1` and can be reproduced with the current release.
+
+The earlier 111-cluster file was produced before the fix described in
+[Correction](#correction-2026-11-25) and is available only in git history.
 
 ```bash
 # find seed wallets by sampling recent pump.fun activity
@@ -359,7 +362,7 @@ a lawyer or an exchange — I write those reports with this tool:
 - **Standard $299** — up to 5 wallets, 72h
 - **Deep $699** — up to 15 wallets, legal appendix, 5 business days
 
-Every claim carries a signature. Sample report (real case, 96 launches):
+Every claim carries a signature. Sample report (real case, 14 launches):
 [docs/sample-report.md](docs/sample-report.md)
 
 ## Tests
