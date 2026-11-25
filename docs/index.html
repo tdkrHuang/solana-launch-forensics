@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>solana-launch-forensics</title>
+<title>Find the dev wallet behind a pump.fun token — solana-launch-forensics</title>
+<meta name="description" content="Read-only Solana forensics. Paste a wallet to see every pump.fun token it created and whose creator fees it collected — each line backed by a transaction signature." />
+<link rel="canonical" href="https://tdkrhuang.github.io/solana-launch-forensics/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Find the dev wallet behind a pump.fun token" />
+<meta property="og:description" content="Paste a wallet, see the launches it created and the creator fees it collected. MIT, no API key." />
+<meta property="og:url" content="https://tdkrhuang.github.io/solana-launch-forensics/" />
 <style>
   :root { --bg:#0b0f17; --panel:#121826; --line:#1f2937; --text:#e5e7eb; --muted:#94a3b8; }
   * { box-sizing: border-box; }
@@ -25,8 +31,9 @@
 <div class="wrap">
   <h1>solana-launch-forensics</h1>
   <p>
-    Read-only forensics for pump.fun style launches. Standard library only, MIT,
-    every output line traceable to a transaction signature.
+    Read-only forensics for pump.fun style launches: who created a token, whose creator
+    fees were collected, and who funded the wallet. Standard library only, MIT, every
+    output line traceable to a transaction signature.
   </p>
   <p><code>pip install solana-launch-forensics</code></p>
 
@@ -50,6 +57,10 @@
     <a class="card" href="https://dev.to/tdkrhuang/one-wallet-108-launches-in-9-hours-what-a-fee-sweep-actually-proves-34b6">
       <b>Case write-up →</b>
       <span>One wallet, 108 launches in 9 hours: 88 signed fee collections, and what the data cannot tell you.</span>
+    </a>
+    <a class="card" href="https://dev.to/tdkrhuang/how-to-find-the-dev-wallet-of-a-pumpfun-token-and-verify-it-yourself-oe9">
+      <b>How to find the dev wallet →</b>
+      <span>Creator, funder, first buyer are three different wallets. Which one the chain can prove, and how to check it in a minute.</span>
     </a>
   </div>
 

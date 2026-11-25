@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tdkrhuang.github.io/solana-launch-forensics/sitemap.xml

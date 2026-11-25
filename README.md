@@ -30,6 +30,7 @@ showing what the paid write-up looks like.
 
 - [A fee sweep is not a creation](https://dev.to/tdkrhuang/reading-solana-launch-logs-correctly-a-fee-sweep-is-not-a-creation-4gf4) — the two events, and why attribution needs the invoke stack
 - [One wallet, 108 launches in 9 hours](https://dev.to/tdkrhuang/one-wallet-108-launches-in-9-hours-what-a-fee-sweep-actually-proves-34b6) — a full cluster from the dataset, and what it cannot tell you
+- [How to find the dev wallet of a pump.fun token](https://dev.to/tdkrhuang/how-to-find-the-dev-wallet-of-a-pumpfun-token-and-verify-it-yourself-oe9) — creator vs funder vs first buyer, and why walking a popular mint backwards does not work
 
 ```
 $ launchforensics scan GtTg74Zp…4W14 --limit 60
