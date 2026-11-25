@@ -125,6 +125,10 @@
   .note { font-size: 12px; color: #fbbf24; margin-top: 10px; }
   footer { margin-top: 26px; font-size: 12px; color: #64748b; }
   .offer { margin-top: 22px; }
+  .faq h3 { font-size: 14px; margin: 18px 0 4px; color: var(--text); }
+  .faq p { margin: 0 0 8px; color: var(--muted); font-size: 13.5px; }
+  .faq .more { margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .faq .more a { color: #7dd3fc; }
   .offer p { margin: 0 0 10px; color: var(--muted); font-size: 13.5px; }
   .offer b { color: var(--text); }
 </style>
@@ -225,6 +229,54 @@
       own RPC URL under “RPC” if you have one.
     </div>
   </details>
+
+  <section class="panel faq" id="faq">
+    <h2>Questions this page answers</h2>
+
+    <h3>Who is the dev wallet of a pump.fun token?</h3>
+    <p>
+      The creator is the wallet that paid for the transaction containing the <code>Create</code>
+      instruction. On a fresh token that transaction is the mint's first transaction, so it is the
+      oldest signature on the mint — expensive to reach on a token that has been trading for hours.
+      The cheaper route is the reverse: look for the mint's creator-fee collection, which only the
+      creator can perform and which happens near the top of the mint's history.
+    </p>
+
+    <h3>Is it the creator, or just the first buyer?</h3>
+    <p>
+      A buy is not a creation. If the wallet only bought the token, its edge will be absent here,
+      and any "dev wallet" claim built on a buy should be rejected. A fee sweep is the part that
+      cannot be faked: the pump.fun program enforces that only the mint's creator collects its fee.
+    </p>
+
+    <h3>Can two wallets be the same creator?</h3>
+    <p>
+      They can be linked: the graph draws an orange edge when one funded the other. That is a lead,
+      not proof — exchanges and faucets fund thousands of unrelated wallets. Every edge keeps its
+      signature so you can check the transfer yourself.
+    </p>
+
+    <h3>Does this tell me whether the dev sold?</h3>
+    <p>
+      No. Selling is a swap out of a token account, and this page maps creation and control, not
+      disposal. Anyone claiming a graph like this proves a dump is adding something the data does
+      not contain.
+    </p>
+
+    <h3>Is it free, and does it need an API key?</h3>
+    <p>
+      Free and MIT licensed. The page talks to a public Solana RPC from your browser, so there is
+      no signup and nothing to install. Rate limits are the only cost; you can paste your own RPC
+      endpoint if you have one.
+    </p>
+
+    <p class="more">
+      Background:
+      <a href="https://dev.to/tdkrhuang/how-to-find-the-dev-wallet-of-a-pumpfun-token-and-verify-it-yourself-oe9">how to find the dev wallet</a> ·
+      <a href="https://dev.to/tdkrhuang/one-wallet-108-launches-in-9-hours-what-a-fee-sweep-actually-proves-34b6">the 108-launch case</a> ·
+      <a href="https://dev.to/tdkrhuang/reading-solana-launch-logs-correctly-a-fee-sweep-is-not-a-creation-4gf4">reading the logs</a>
+    </p>
+  </section>
 
   <section class="panel offer">
     <h2>Need this for one wallet, in a form you can hand to someone else?</h2>
